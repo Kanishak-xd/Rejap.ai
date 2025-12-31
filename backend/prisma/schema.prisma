@@ -1,0 +1,168 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  googleId     String?  @unique @map("google_id")
+  email        String   @unique
+  name         String?
+  profileImage String?  @map("profile_image")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  moduleProgress   UserModuleProgress[]
+  quizAttempts     UserQuizAttempt[]
+  levelStatus      UserLevelStatus[]
+
+  @@map("users")
+}
+
+model Level {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  order       Int      @unique
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  modules      Module[]
+  userStatuses UserLevelStatus[]
+
+  @@map("levels")
+}
+
+model Module {
+  id          String   @id @default(uuid())
+  levelId     String   @map("level_id")
+  title       String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  level         Level         @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  contentItems  ContentItem[]
+  quizzes       Quiz[]
+  userProgress  UserModuleProgress[]
+
+  @@unique([levelId, order])
+  @@map("modules")
+}
+
+model ContentItem {
+  id        String   @id @default(uuid())
+  moduleId  String   @map("module_id")
+  title     String
+  content   String   @db.Text
+  type      String   // e.g., "text", "video", "image", "code"
+  order     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, order])
+  @@map("content_items")
+}
+
+model Quiz {
+  id          String   @id @default(uuid())
+  moduleId    String   @map("module_id")
+  title       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  module       Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions    QuizQuestion[]
+  userAttempts UserQuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id          String   @id @default(uuid())
+  quizId      String   @map("quiz_id")
+  question    String   @db.Text
+  type        String   // e.g., "multiple_choice", "true_false", "short_answer"
+  options     Json?    // For multiple choice questions
+  correctAnswer String @map("correct_answer") @db.Text
+  order       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, order])
+  @@map("quiz_questions")
+}
+
+model UserModuleProgress {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  moduleId   String   @map("module_id")
+  completed  Boolean  @default(false)
+  progress   Float    @default(0) // 0.0 to 1.0
+  completedAt DateTime? @map("completed_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@map("user_module_progress")
+}
+
+model UserQuizAttempt {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  quizId     String   @map("quiz_id")
+  score      Float    // 0.0 to 1.0
+  answers    Json     // Store user's answers
+  completed  Boolean  @default(false)
+  completedAt DateTime? @map("completed_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("user_quiz_attempts")
+}
+
+model UserLevelStatus {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  levelId    String   @map("level_id")
+  unlocked   Boolean  @default(false)
+  completed  Boolean  @default(false)
+  completedAt DateTime? @map("completed_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level Level @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, levelId])
+  @@map("user_level_status")
+}
+
