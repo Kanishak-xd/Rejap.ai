@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 strategy.md
+API_ENDPOINTS.md
+VERIFICATION.md
 
 # Editor directories and files
 .vscode/*
