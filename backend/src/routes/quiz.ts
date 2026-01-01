@@ -529,72 +529,85 @@ router.post('/submit', requireAuth, async (req: AuthenticatedRequest, res: Respo
     }
 });
 
-// GET /api/quiz/diagnostic - Get diagnostic questions
+// GET /api/quiz/diagnostic - Get diagnostic questions from real dataset
 router.get('/diagnostic', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-    const diagnosticQuestions = [
-        {
-            id: 'd1',
-            question: 'What is the meaning of "こんにちは" (Konnichiwa)?',
-            options: ['Hello', 'Goodbye', 'Thank you', 'Not sure'],
-            correctAnswer: 'Hello'
-        },
-        {
-            id: 'd2',
-            question: 'Which is the correct reading for the kanji "水"?',
-            options: ['Mizu', 'Hi', 'Ki', 'Not sure'],
-            correctAnswer: 'Mizu'
-        },
-        {
-            id: 'd3',
-            question: 'Translate "I am a student":',
-            options: ['Watashi wa gakusei desu', 'Watashi wa sensei desu', 'Watashi wa inu desu', 'Not sure'],
-            correctAnswer: 'Watashi wa gakusei desu'
-        },
-        {
-            id: 'd4',
-            question: 'What does the particle "に" indicate in "学校に行きます" (Gakkou ni ikimasu)?',
-            options: ['Direction/Destination', 'Subject', 'Object', 'Not sure'],
-            correctAnswer: 'Direction/Destination'
-        },
-        {
-            id: 'd5',
-            question: 'What is the correct reading for "昨日"?',
-            options: ['Kinou', 'Ashita', 'Kyou', 'Not sure'],
-            correctAnswer: 'Kinou'
-        },
-        {
-            id: 'd6',
-            question: 'What is the meaning of "食べられる" (Taberareru)?',
-            options: ['Can eat', 'Must eat', 'Want to eat', 'Not sure'],
-            correctAnswer: 'Can eat'
-        },
-        {
-            id: 'd7',
-            question: 'Which kanji means "to read"?',
-            options: ['読', '書', '話', 'Not sure'],
-            correctAnswer: '読'
-        },
-        {
-            id: 'd8',
-            question: 'What is the meaning of "遠慮なく" (Enryo naku)?',
-            options: ['Without hesitation', 'With regret', 'Carefully', 'Not sure'],
-            correctAnswer: 'Without hesitation'
-        },
-        {
-            id: 'd9',
-            question: 'What is the correct reading for "雰囲気"?',
-            options: ['Fun\'iki', 'Fuinki', 'Funiki', 'Not sure'],
-            correctAnswer: 'Fun\'iki'
-        },
-        {
-            id: 'd10',
-            question: 'What does "お世話になります" (Osewa ni narimasu) typically mean?',
-            options: ['Thank you for your support/care', 'Excuse me', 'Nice to meet you', 'Not sure'],
-            correctAnswer: 'Thank you for your support/care'
-        }
-    ];
+    try {
+        // Fetch levels to identify Beginner, Intermediate, Advanced
+        const levels = await prisma.level.findMany({
+            orderBy: { order: 'asc' }
+        });
 
-    res.json(diagnosticQuestions);
+        const beginnerLevel = levels.find(l => l.order === 1);
+        const intermediateLevel = levels.find(l => l.order === 2);
+        const advancedLevel = levels.find(l => l.order === 3);
+
+        const getQuizzesForLevel = async (levelId: string | undefined, count: number) => {
+            if (!levelId) return [];
+            return await prisma.quiz.findMany({
+                where: {
+                    module: {
+                        levelId: levelId
+                    }
+                },
+                include: {
+                    questions: true
+                },
+                take: 20 // Get a pool to randomize from
+            });
+        };
+
+        const [bQuizzes, iQuizzes, aQuizzes] = await Promise.all([
+            getQuizzesForLevel(beginnerLevel?.id, 3),
+            getQuizzesForLevel(intermediateLevel?.id, 4),
+            getQuizzesForLevel(advancedLevel?.id, 3)
+        ]);
+
+        let allQuestions: any[] = [];
+
+        const addQuestionsFromQuizzes = (quizzes: any[], count: number) => {
+            const shuffledQuizzes = quizzes.sort(() => 0.5 - Math.random());
+            const selectedQuizzes = shuffledQuizzes.slice(0, count);
+
+            for (const quiz of selectedQuizzes) {
+                if (quiz.questions.length > 0) {
+                    const randomQ = quiz.questions[Math.floor(Math.random() * quiz.questions.length)];
+                    allQuestions.push({
+                        id: randomQ.id,
+                        question: randomQ.question,
+                        options: [...(randomQ.options as string[]), 'Not sure']
+                    });
+                }
+            }
+        };
+
+        addQuestionsFromQuizzes(bQuizzes, 3);
+        addQuestionsFromQuizzes(iQuizzes, 4);
+        addQuestionsFromQuizzes(aQuizzes, 3);
+
+        // If we still have fewer than 10 questions (unlikely but possible), fill up
+        if (allQuestions.length < 10) {
+            const allAvailableQuizzes = [...bQuizzes, ...iQuizzes, ...aQuizzes];
+            let quizIndex = 0;
+            while (allQuestions.length < 10 && allAvailableQuizzes.length > 0) {
+                const quiz = allAvailableQuizzes[quizIndex % allAvailableQuizzes.length];
+                const extraQ = quiz.questions.find((q: any) => !allQuestions.some(aq => aq.id === q.id));
+                if (extraQ) {
+                    allQuestions.push({
+                        id: extraQ.id,
+                        question: extraQ.question,
+                        options: [...(extraQ.options as string[]), 'Not sure']
+                    });
+                }
+                quizIndex++;
+                if (quizIndex > 100) break;
+            }
+        }
+
+        res.json(allQuestions.slice(0, 10));
+    } catch (error) {
+        console.error('Error fetching diagnostic questions:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // POST /api/quiz/diagnostic - Initial assessment to assign starting level
@@ -610,28 +623,21 @@ router.post('/diagnostic', requireAuth, async (req: AuthenticatedRequest, res: R
             return res.status(400).json({ error: 'answers array is required' });
         }
 
-        const diagnosticQuestions = [
-            { id: 'd1', correctAnswer: 'Hello' },
-            { id: 'd2', correctAnswer: 'Mizu' },
-            { id: 'd3', correctAnswer: 'Watashi wa gakusei desu' },
-            { id: 'd4', correctAnswer: 'Direction/Destination' },
-            { id: 'd5', correctAnswer: 'Kinou' },
-            { id: 'd6', correctAnswer: 'Can eat' },
-            { id: 'd7', correctAnswer: '読' },
-            { id: 'd8', correctAnswer: 'Without hesitation' },
-            { id: 'd9', correctAnswer: 'Fun\'iki' },
-            { id: 'd10', correctAnswer: 'Thank you for your support/care' }
-        ];
+        // Fetch the questions from DB to verify answers
+        const questionIds = answers.map((a: any) => a.questionId);
+        const dbQuestions = await prisma.quizQuestion.findMany({
+            where: { id: { in: questionIds } }
+        });
 
         let correctCount = 0;
         answers.forEach((ans: any) => {
-            const question = diagnosticQuestions.find(q => q.id === ans.questionId);
+            const question = dbQuestions.find(q => q.id === ans.questionId);
             if (question && ans.answer === question.correctAnswer) {
                 correctCount++;
             }
         });
 
-        const score = correctCount / diagnosticQuestions.length;
+        const score = correctCount / 10; // Based on 10 questions
 
         // Determine level based on score
         let assignedLevelOrder = 1; // Default Beginner
@@ -641,68 +647,75 @@ router.post('/diagnostic', requireAuth, async (req: AuthenticatedRequest, res: R
             assignedLevelOrder = 2; // Intermediate
         }
 
-        const level = await prisma.level.findFirst({
-            where: { order: assignedLevelOrder }
+        const allLevels = await prisma.level.findMany({
+            orderBy: { order: 'asc' }
         });
 
-        if (!level) {
+        const assignedLevel = allLevels.find(l => l.order === assignedLevelOrder);
+
+        if (!assignedLevel) {
             return res.status(500).json({ error: 'Assigned level not found' });
         }
 
         // Update user's current level
         await prisma.user.update({
             where: { id: req.user.id },
-            data: { currentLevelId: level.id }
+            data: { currentLevelId: assignedLevel.id }
         });
 
-        // Initialize progress for the assigned level's modules
-        const modules = await prisma.module.findMany({
-            where: { levelId: level.id },
-            orderBy: { order: 'asc' }
-        });
+        // UNLOCKING LOGIC: Unlock assigned level AND all previous levels
+        const levelsToUnlock = allLevels.filter(l => l.order <= assignedLevelOrder);
 
-        for (const module of modules) {
-            await prisma.userModuleProgress.upsert({
+        for (const level of levelsToUnlock) {
+            // Initialize level status
+            await prisma.userLevelStatus.upsert({
                 where: {
-                    userId_moduleId: {
+                    userId_levelId: {
                         userId: req.user.id,
-                        moduleId: module.id
+                        levelId: level.id
                     }
                 },
-                update: {},
+                update: { unlocked: true },
                 create: {
                     userId: req.user.id,
-                    moduleId: module.id,
+                    levelId: level.id,
                     completed: false,
-                    progress: 0,
-                    unlocked: module.order === 1 // Unlock first module
+                    unlocked: true
                 }
             });
-        }
 
-        // Initialize level status
-        await prisma.userLevelStatus.upsert({
-            where: {
-                userId_levelId: {
-                    userId: req.user.id,
-                    levelId: level.id
-                }
-            },
-            update: {},
-            create: {
-                userId: req.user.id,
-                levelId: level.id,
-                completed: false,
-                unlocked: true
+            // Initialize progress for all modules in these levels
+            const modules = await prisma.module.findMany({
+                where: { levelId: level.id },
+                orderBy: { order: 'asc' }
+            });
+
+            for (const module of modules) {
+                await prisma.userModuleProgress.upsert({
+                    where: {
+                        userId_moduleId: {
+                            userId: req.user.id,
+                            moduleId: module.id
+                        }
+                    },
+                    update: { unlocked: true },
+                    create: {
+                        userId: req.user.id,
+                        moduleId: module.id,
+                        completed: false,
+                        progress: 0,
+                        unlocked: true // Unlock all modules in previous/current levels
+                    }
+                });
             }
-        });
+        }
 
         res.json({
             score,
             correctCount,
-            totalQuestions: diagnosticQuestions.length,
-            assignedLevel: level.title,
-            levelId: level.id
+            totalQuestions: 10,
+            assignedLevel: assignedLevel.title,
+            levelId: assignedLevel.id
         });
     } catch (error) {
         console.error('Error processing diagnostic quiz:', error);

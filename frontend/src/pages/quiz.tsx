@@ -148,9 +148,9 @@ export default function Quiz() {
   const allAnswered = quiz.questions.every((q) => selectedAnswers[q.id])
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 sm:py-16 max-w-4xl">
       {/* Breadcrumb */}
-      <nav className="mb-8 text-sm text-muted-foreground">
+      <nav className="mb-6 sm:mb-8 text-xs sm:text-sm text-muted-foreground overflow-x-auto whitespace-nowrap pb-2">
         <Link to="/" className="hover:text-foreground">Home</Link>
         {" / "}
         <Link to={`/learn/${level}/${moduleId}`} className="hover:text-foreground">
@@ -160,37 +160,37 @@ export default function Quiz() {
         <span className="text-foreground">Quiz</span>
       </nav>
 
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 font-['Roboto']">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2 font-['Roboto']">
           {quiz.module.title} - Quiz
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Question {currentQuestionIndex + 1} of {quiz.questions.length}
         </p>
       </div>
 
       {!submitted ? (
-        <Card className="border-2 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+        <Card className="border-2 shadow-md overflow-hidden">
+          <CardHeader className="pb-4 pt-6 sm:pt-8">
+            <CardTitle className="text-lg sm:text-xl font-semibold leading-tight">
               {currentQuestion.question}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6">
             <RadioGroup
               value={selectedAnswers[currentQuestion.id] || ""}
               onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
-              className="space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
               {currentQuestion.options.map((option, index) => (
                 <div key={index} className={cn(
-                  "flex items-center space-x-3 p-4 rounded-xl border-2 transition-all cursor-pointer hover:bg-accent",
+                  "flex items-center space-x-3 p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer hover:bg-accent",
                   selectedAnswers[currentQuestion.id] === option ? "border-primary bg-primary/5" : "border-transparent bg-muted/50"
                 )}>
                   <RadioGroupItem value={option} id={`option-${index}`} />
                   <Label
                     htmlFor={`option-${index}`}
-                    className="flex-1 cursor-pointer font-medium"
+                    className="flex-1 cursor-pointer font-medium text-sm sm:text-base"
                   >
                     {option}
                   </Label>
@@ -199,12 +199,12 @@ export default function Quiz() {
             </RadioGroup>
 
             {/* Navigation buttons */}
-            <div className="flex justify-between mt-8">
+            <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className="gap-2"
+                className="w-full sm:w-auto gap-2 order-2 sm:order-1"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Previous
@@ -213,7 +213,7 @@ export default function Quiz() {
                 <Button
                   onClick={handleSubmit}
                   disabled={!allAnswered}
-                  className="gap-2 px-8"
+                  className="w-full sm:w-auto gap-2 px-8 order-1 sm:order-2"
                 >
                   <Send className="w-4 h-4" />
                   Submit Quiz
@@ -222,7 +222,7 @@ export default function Quiz() {
                 <Button
                   onClick={handleNext}
                   disabled={!selectedAnswers[currentQuestion.id]}
-                  className="gap-2"
+                  className="w-full sm:w-auto gap-2 order-1 sm:order-2"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
@@ -248,8 +248,8 @@ export default function Quiz() {
 
           {/* Detailed Review Section */}
           <div className="mt-12 space-y-6">
-            <h3 className="font-bold text-2xl border-b pb-2 flex items-center gap-2">
-              <BookOpen className="w-6 h-6" />
+            <h3 className="font-bold text-xl sm:text-2xl border-b pb-2 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 sm:w-6 h-6" />
               Detailed Review
             </h3>
             <div className="space-y-4">
@@ -259,18 +259,18 @@ export default function Quiz() {
 
                 return (
                   <div key={question.id} className={cn(
-                    "border rounded-xl p-6 transition-all",
+                    "border rounded-xl p-4 sm:p-6 transition-all",
                     isCorrect ? "bg-green-50/50 border-green-100" : "bg-orange-50/50 border-orange-100"
                   )}>
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3 sm:gap-4">
                       <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1",
+                        "w-7 h-7 sm:w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1",
                         isCorrect ? "bg-green-500 text-white" : "bg-orange-500 text-white"
                       )}>
-                        {isCorrect ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                        {isCorrect ? <CheckCircle2 className="w-4 h-4 sm:w-5 h-5" /> : <XCircle className="w-4 h-4 sm:w-5 h-5" />}
                       </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-lg mb-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base sm:text-lg mb-3">
                           {index + 1}. {question.question}
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">

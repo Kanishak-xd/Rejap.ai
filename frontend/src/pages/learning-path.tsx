@@ -119,10 +119,10 @@ export default function LearningPath() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-12 max-w-5xl">
-            <div className="mb-12">
-                <h1 className="text-4xl font-bold mb-2 font-['Roboto']">My Learning Path</h1>
-                <p className="text-muted-foreground">Track your progress and continue your Japanese journey.</p>
+        <div className="container mx-auto px-4 py-8 sm:py-12 max-w-5xl">
+            <div className="mb-8 lg:mb-12">
+                <h1 className="text-3xl sm:text-4xl font-bold mb-2 font-['Roboto']">My Learning Path</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">Track your progress and continue your Japanese journey.</p>
             </div>
 
             {/* Continue Learning Section */}
@@ -130,27 +130,36 @@ export default function LearningPath() {
                 <Card className="mb-12 border-2 border-primary/20 bg-primary/5 shadow-lg overflow-hidden">
                     <CardContent className="p-0">
                         <div className="flex flex-col md:flex-row">
-                            <div className="p-8 flex-1">
-                                <div className="flex items-center gap-2 text-primary font-bold mb-4">
-                                    <Sparkles className="w-5 h-5" />
-                                    <span>CONTINUE WHERE YOU LEFT OFF</span>
+                            <div className="p-6 sm:p-8 flex-1">
+                                <div className="flex items-center gap-2 text-primary font-bold mb-3 sm:mb-4">
+                                    <Sparkles className="w-4 h-4 sm:w-5 h-5" />
+                                    <span className="text-xs sm:text-sm tracking-wider uppercase">CONTINUE WHERE YOU LEFT OFF</span>
                                 </div>
-                                <h2 className="text-3xl font-bold mb-2">{continueData.module.title}</h2>
-                                <p className="text-muted-foreground mb-6">
+                                <h2 className="text-2xl sm:text-3xl font-bold mb-2">{continueData.module.title}</h2>
+                                <p className="text-sm sm:text-base text-muted-foreground mb-6">
                                     Next step in your {continueData.level.title} journey. You're doing great!
                                 </p>
-                                <Button asChild size="lg" className="rounded-xl px-8 py-6 text-lg font-bold shadow-md">
+                                <Button asChild size="lg" className="w-full sm:w-auto rounded-xl px-8 py-6 text-lg font-bold shadow-md">
                                     <Link to={`/learn/${continueData.level.id}/${continueData.module.id}`}>
                                         Start Lesson
                                         <PlayCircle className="ml-2 w-5 h-5" />
                                     </Link>
                                 </Button>
                             </div>
-                            <div className="bg-primary/10 p-8 md:w-72 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-primary/10">
+                            <div className="bg-primary/10 p-6 sm:p-8 md:w-72 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-primary/10">
                                 <div className="text-center">
-                                    <p className="text-sm font-bold text-muted-foreground mb-2">LEVEL PROGRESS</p>
-                                    <div className="relative w-24 h-24 flex items-center justify-center mb-2 mx-auto">
+                                    <p className="text-xs font-bold text-muted-foreground mb-3 sm:mb-4 uppercase tracking-wider">LEVEL PROGRESS</p>
+                                    <div className="relative w-20 h-20 sm:w-24 h-24 flex items-center justify-center mb-2 mx-auto">
                                         <svg className="w-full h-full transform -rotate-90">
+                                            <circle
+                                                cx="40"
+                                                cy="40"
+                                                r="34"
+                                                stroke="currentColor"
+                                                strokeWidth="6"
+                                                fill="transparent"
+                                                className="text-muted/20 sm:hidden"
+                                            />
                                             <circle
                                                 cx="48"
                                                 cy="48"
@@ -158,7 +167,18 @@ export default function LearningPath() {
                                                 stroke="currentColor"
                                                 strokeWidth="8"
                                                 fill="transparent"
-                                                className="text-muted/20"
+                                                className="text-muted/20 hidden sm:block"
+                                            />
+                                            <circle
+                                                cx="40"
+                                                cy="40"
+                                                r="34"
+                                                stroke="currentColor"
+                                                strokeWidth="6"
+                                                fill="transparent"
+                                                strokeDasharray={213.6}
+                                                strokeDashoffset={213.6 - (213.6 * continueData.level.progress) / 100}
+                                                className="text-primary transition-all duration-1000 sm:hidden"
                                             />
                                             <circle
                                                 cx="48"
@@ -169,10 +189,10 @@ export default function LearningPath() {
                                                 fill="transparent"
                                                 strokeDasharray={251.2}
                                                 strokeDashoffset={251.2 - (251.2 * continueData.level.progress) / 100}
-                                                className="text-primary transition-all duration-1000"
+                                                className="text-primary transition-all duration-1000 hidden sm:block"
                                             />
                                         </svg>
-                                        <span className="absolute text-xl font-bold">{Math.round(continueData.level.progress)}%</span>
+                                        <span className="absolute text-lg sm:text-xl font-bold">{Math.round(continueData.level.progress)}%</span>
                                     </div>
                                     <p className="text-xs font-medium text-muted-foreground">{continueData.level.title}</p>
                                 </div>
@@ -181,10 +201,10 @@ export default function LearningPath() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="mb-12 border-2 border-green-500/20 bg-green-500/5 p-8 text-center">
-                    <Trophy className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold mb-2">All Caught Up!</h2>
-                    <p className="text-muted-foreground">You've completed all available modules. Great job!</p>
+                <Card className="mb-12 border-2 border-green-500/20 bg-green-500/5 p-6 sm:p-8 text-center">
+                    <Trophy className="w-12 h-12 sm:w-16 h-16 text-green-500 mx-auto mb-4" />
+                    <h2 className="text-xl sm:text-2xl font-bold mb-2">All Caught Up!</h2>
+                    <p className="text-sm sm:text-base text-muted-foreground">You've completed all available modules. Great job!</p>
                 </Card>
             )}
 
@@ -193,30 +213,30 @@ export default function LearningPath() {
                 {levels.map((level) => (
                     <div key={level.id} className={cn("space-y-6", !level.unlocked && "opacity-60")}>
                         <div className="flex items-center justify-between border-b pb-4">
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4">
                                 <div className={cn(
-                                    "w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm",
+                                    "w-10 h-10 sm:w-12 h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm shrink-0",
                                     level.unlocked ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                                 )}>
-                                    {level.unlocked ? <BookOpen className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
+                                    {level.unlocked ? <BookOpen className="w-5 h-5 sm:w-6 h-6" /> : <Lock className="w-5 h-5 sm:w-6 h-6" />}
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold font-['Roboto'] flex items-center gap-2">
+                                    <h3 className="text-xl sm:text-2xl font-bold font-['Roboto'] flex items-center gap-2">
                                         {level.title}
-                                        {level.completed && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                                        {level.completed && <CheckCircle2 className="w-4 h-4 sm:w-5 h-5 text-green-500" />}
                                     </h3>
-                                    <p className="text-sm text-muted-foreground">{level.description}</p>
+                                    <p className="text-xs sm:text-sm text-muted-foreground">{level.description}</p>
                                 </div>
                             </div>
                             {level.unlocked && (
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-xs font-bold text-muted-foreground mb-1">MASTERY</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-wider">MASTERY</p>
                                     <p className="text-lg font-bold">{Math.round(level.progress)}%</p>
                                 </div>
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             {level.modules.map((module) => (
                                 <Card
                                     key={module.id}
@@ -227,19 +247,19 @@ export default function LearningPath() {
                                 >
                                     <CardHeader className="pb-2">
                                         <div className="flex justify-between items-start mb-2">
-                                            <span className="text-xs font-bold text-muted-foreground">MODULE {module.order}</span>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">MODULE {module.order}</span>
                                             {module.completed ? (
-                                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                                <CheckCircle2 className="w-4 h-4 sm:w-5 h-5 text-green-500" />
                                             ) : !module.unlocked ? (
-                                                <Lock className="w-4 h-4 text-muted-foreground" />
+                                                <Lock className="w-3.5 h-3.5 sm:w-4 h-4 text-muted-foreground" />
                                             ) : null}
                                         </div>
-                                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                                        <CardTitle className="text-base sm:text-lg group-hover:text-primary transition-colors">
                                             {module.title}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+                                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
                                             {module.description || "Master the fundamentals of this topic."}
                                         </p>
 

@@ -132,35 +132,35 @@ export default function Onboarding() {
     return (
       <div className="container mx-auto px-4 py-16 max-w-2xl">
         <Card className="border-2 shadow-xl overflow-hidden">
-          <div className="bg-primary/10 p-8 text-center border-b">
-            <div className="w-20 h-20 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Sparkles className="w-10 h-10" />
+          <div className="bg-primary/10 p-6 sm:p-8 text-center border-b">
+            <div className="w-16 h-16 sm:w-20 h-20 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Sparkles className="w-8 h-8 sm:w-10 h-10" />
             </div>
-            <h2 className="text-3xl font-bold mb-2">Assessment Complete!</h2>
-            <p className="text-muted-foreground">We've analyzed your Japanese proficiency.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Assessment Complete!</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">We've analyzed your Japanese proficiency.</p>
           </div>
-          <CardContent className="p-8 text-center">
-            <div className="mb-8">
-              <p className="text-sm uppercase tracking-widest text-muted-foreground font-bold mb-1">Your Assigned Level</p>
-              <h3 className="text-5xl font-black text-primary font-['Roboto'] mb-4">{result.assignedLevel}</h3>
-              <div className="flex justify-center gap-4 text-sm font-medium">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <div className="mb-6 sm:mb-8">
+              <p className="text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground font-bold mb-2">Your Assigned Level</p>
+              <h3 className="text-4xl sm:text-5xl font-black text-primary font-['Roboto'] mb-4">{result.assignedLevel}</h3>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm font-medium">
                 <span className="px-3 py-1 bg-muted rounded-full">Score: {Math.round(result.score * 100)}%</span>
                 <span className="px-3 py-1 bg-muted rounded-full">{result.correctCount}/{result.totalQuestions} Correct</span>
               </div>
             </div>
 
-            <p className="text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-sm sm:text-base text-muted-foreground mb-8 leading-relaxed">
               Based on your performance, we've tailored a learning path specifically for you.
               You can now start with the first module of the <strong>{result.assignedLevel}</strong> level.
             </p>
 
             <Button
               size="lg"
-              className="w-full py-8 text-xl font-bold rounded-2xl shadow-lg hover:scale-[1.02] transition-transform"
+              className="w-full py-6 sm:py-8 text-lg sm:text-xl font-bold rounded-2xl shadow-lg hover:scale-[1.02] transition-transform"
               onClick={() => navigate("/learning-path")}
             >
               Go to My Learning Path
-              <ChevronRight className="ml-2 w-6 h-6" />
+              <ChevronRight className="ml-2 w-5 h-5 sm:w-6 h-6" />
             </Button>
           </CardContent>
         </Card>
@@ -183,10 +183,10 @@ export default function Onboarding() {
   const canSubmit = Object.keys(answers).length === questions.length
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-3xl">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold mb-4 font-['Roboto']">Diagnostic Quiz</h1>
-        <p className="text-muted-foreground max-w-lg mx-auto">
+    <div className="container mx-auto px-4 py-8 sm:py-16 max-w-3xl">
+      <div className="mb-8 sm:mb-12 text-center">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 font-['Roboto']">Diagnostic Quiz</h1>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto px-2">
           Answer these 10 questions to help us determine your starting level.
           Don't worry if you're not sure—just select "Not sure".
         </p>
@@ -200,9 +200,9 @@ export default function Onboarding() {
         <Progress value={progress} className="h-2" />
       </div>
 
-      <Card className="border-2 shadow-lg">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-2xl font-bold leading-tight">
+      <Card className="border-2 shadow-lg overflow-hidden">
+        <CardHeader className="pb-4 pt-6 sm:pt-8">
+          <CardTitle className="text-xl sm:text-2xl font-bold leading-tight">
             {currentQuestion.question}
           </CardTitle>
         </CardHeader>
@@ -210,27 +210,27 @@ export default function Onboarding() {
           <RadioGroup
             value={answers[currentQuestion.id] || ""}
             onValueChange={(val) => handleAnswer(currentQuestion.id, val)}
-            className="space-y-3"
+            className="space-y-2 sm:space-y-3"
           >
             {currentQuestion.options.map((option, idx) => (
               <div key={idx} className={cn(
-                "flex items-center space-x-3 p-4 rounded-xl border-2 transition-all cursor-pointer hover:bg-accent",
+                "flex items-center space-x-3 p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer hover:bg-accent",
                 answers[currentQuestion.id] === option ? "border-primary bg-primary/5" : "border-transparent bg-muted/50"
               )}>
                 <RadioGroupItem value={option} id={`option-${idx}`} />
-                <Label htmlFor={`option-${idx}`} className="flex-1 cursor-pointer font-medium text-lg">
+                <Label htmlFor={`option-${idx}`} className="flex-1 cursor-pointer font-medium text-base sm:text-lg">
                   {option}
                 </Label>
               </div>
             ))}
           </RadioGroup>
 
-          <div className="flex justify-between mt-12">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 mt-8 sm:mt-12">
             <Button
               variant="outline"
               onClick={handleBack}
               disabled={currentIndex === 0}
-              className="px-6 py-6 rounded-xl border-2"
+              className="w-full sm:w-auto px-6 py-6 rounded-xl border-2 order-2 sm:order-1"
             >
               <ChevronLeft className="mr-2 w-5 h-5" />
               Back
@@ -240,7 +240,7 @@ export default function Onboarding() {
               <Button
                 onClick={handleSubmit}
                 disabled={!canSubmit || submitting}
-                className="px-10 py-6 rounded-xl font-bold text-lg shadow-md"
+                className="w-full sm:w-auto px-10 py-6 rounded-xl font-bold text-lg shadow-md order-1 sm:order-2"
               >
                 {submitting ? "Analyzing..." : "Finish Assessment"}
                 {!submitting && <CheckCircle2 className="ml-2 w-5 h-5" />}
@@ -249,7 +249,7 @@ export default function Onboarding() {
               <Button
                 onClick={handleNext}
                 disabled={!answers[currentQuestion.id]}
-                className="px-10 py-6 rounded-xl font-bold text-lg shadow-md"
+                className="w-full sm:w-auto px-10 py-6 rounded-xl font-bold text-lg shadow-md order-1 sm:order-2"
               >
                 Next
                 <ChevronRight className="ml-2 w-5 h-5" />

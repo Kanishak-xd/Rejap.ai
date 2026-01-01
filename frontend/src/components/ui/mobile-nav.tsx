@@ -11,9 +11,12 @@ interface NavItem {
 
 interface MobileNavProps {
   nav: NavItem[]
+  user: any | null
+  onSignOut: () => void
+  onSignIn: () => void
 }
 
-export function MobileNav({ nav }: MobileNavProps) {
+export function MobileNav({ nav, user, onSignOut, onSignIn }: MobileNavProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -39,19 +42,19 @@ export function MobileNav({ nav }: MobileNavProps) {
                 <X />
               </Button>
             </div>
-            <nav className="flex flex-col gap-4">
+            <nav className="flex flex-col gap-6 overflow-y-auto pb-8">
               {nav.map((section) => (
                 <div key={section.name}>
-                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground/70 px-3">
                     {section.name}
                   </h3>
-                  <ul className="flex flex-col gap-2">
+                  <ul className="flex flex-col gap-1">
                     {section.items.map((item) => (
                       <li key={item.href}>
                         <Link
                           to={item.href}
                           className={cn(
-                            "block rounded-md px-3 py-2 text-sm hover:bg-accent"
+                            "block rounded-lg px-3 py-2.5 text-base font-medium transition-colors hover:bg-accent active:bg-accent/80"
                           )}
                           onClick={() => setOpen(false)}
                         >
@@ -62,6 +65,34 @@ export function MobileNav({ nav }: MobileNavProps) {
                   </ul>
                 </div>
               ))}
+
+              <div className="mt-4 pt-6 border-t border-border/50 px-3">
+                {user ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 py-2">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold truncate max-w-[180px]">{user.name || user.email}</span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      <Button asChild variant="outline" className="justify-start h-11 rounded-xl" onClick={() => setOpen(false)}>
+                        <Link to="/profile">View Profile</Link>
+                      </Button>
+                      <Button variant="destructive" className="justify-start h-11 rounded-xl" onClick={() => { onSignOut(); setOpen(false); }}>
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button className="w-full h-12 rounded-xl font-bold text-lg shadow-md" onClick={() => { onSignIn(); setOpen(false); }}>
+                    Sign In
+                  </Button>
+                )}
+              </div>
             </nav>
           </div>
         </div>

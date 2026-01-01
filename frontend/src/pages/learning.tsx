@@ -104,9 +104,9 @@ export default function Learning() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 sm:py-16 max-w-4xl">
       {/* Breadcrumb */}
-      <nav className="mb-8 text-sm text-muted-foreground">
+      <nav className="mb-6 sm:mb-8 text-xs sm:text-sm text-muted-foreground overflow-x-auto whitespace-nowrap pb-2">
         <Link to="/" className="hover:text-foreground">Home</Link>
         {" / "}
         {module && (
@@ -122,15 +122,15 @@ export default function Learning() {
 
       {module && (
         <>
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 font-['Roboto']">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 font-['Roboto']">
               {module.title}
             </h1>
-            <div className="flex items-center gap-4 text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-base text-muted-foreground">
               <p>Level: {module.level.title}</p>
               {isCompleted && (
-                <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                  <CheckCircle2 className="w-4 h-4" />
+                <span className="flex items-center gap-1 text-green-600 font-medium text-xs sm:text-sm">
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 h-4" />
                   Completed
                 </span>
               )}
@@ -149,34 +149,38 @@ export default function Learning() {
           {/* Content items */}
           <div className="space-y-8">
             {content.map((item) => (
-              <Card key={item.id} className="border-2 shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+              <Card key={item.id} className="border-2 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                <CardHeader className="pb-2 pt-6 px-4 sm:px-6">
+                  <CardTitle className="text-lg sm:text-xl font-bold">{item.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="prose dark:prose-invert max-w-none text-lg leading-relaxed">
+                <CardContent className="p-0">
+                  <div className="prose dark:prose-invert max-w-none text-base sm:text-lg leading-relaxed">
                     {item.type === "text" && (
-                      <p className="whitespace-pre-wrap">{item.content}</p>
+                      <p className="whitespace-pre-wrap px-4 sm:px-6 pb-6">{item.content}</p>
                     )}
                     {item.type === "code" && (
-                      <div className="relative group">
-                        <pre className="bg-slate-900 text-slate-100 p-6 rounded-xl overflow-x-auto font-mono text-sm">
+                      <div className="relative group px-4 sm:px-6 pb-6">
+                        <pre className="bg-slate-900 text-slate-100 p-4 sm:p-6 rounded-xl overflow-x-auto font-mono text-xs sm:text-sm">
                           <code>{item.content}</code>
                         </pre>
                       </div>
                     )}
                     {item.type === "image" && (
-                      <div className="rounded-xl overflow-hidden border-2">
-                        <img src={item.content} alt={item.title} className="w-full h-auto" />
+                      <div className="px-4 sm:px-6 pb-6">
+                        <div className="rounded-xl overflow-hidden border-2">
+                          <img src={item.content} alt={item.title} className="w-full h-auto" />
+                        </div>
                       </div>
                     )}
                     {item.type === "video" && (
-                      <div className="aspect-video rounded-xl overflow-hidden border-2">
-                        <iframe
-                          src={item.content}
-                          className="w-full h-full"
-                          allowFullScreen
-                        />
+                      <div className="px-4 sm:px-6 pb-6">
+                        <div className="aspect-video rounded-xl overflow-hidden border-2">
+                          <iframe
+                            src={item.content}
+                            className="w-full h-full"
+                            allowFullScreen
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -190,7 +194,7 @@ export default function Learning() {
             <Button
               asChild
               size="lg"
-              className="font-bold px-8 py-6 text-lg rounded-xl shadow-lg hover:scale-105 transition-transform"
+              className="w-full sm:w-auto font-bold px-8 py-6 text-lg rounded-xl shadow-lg hover:scale-105 transition-transform"
             >
               <Link to={`/quiz/${level}/${moduleId}`}>
                 {isCompleted ? "Retake Quiz" : "Take Module Quiz"}
@@ -202,9 +206,9 @@ export default function Learning() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="font-bold px-8 py-6 text-lg rounded-xl border-2"
+                className="w-full sm:w-auto font-bold px-8 py-6 text-lg rounded-xl border-2"
               >
-                <Link to="/learn">
+                <Link to="/learning-path">
                   Back to Learning Path
                 </Link>
               </Button>

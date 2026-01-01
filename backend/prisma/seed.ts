@@ -188,343 +188,240 @@ async function main() {
         },
     });
 
-    // Beginner Module 1: Basic Vocabulary Content
-    console.log('Adding content to Beginner Module 1...');
-    const beginnerVocab = [
-        { title: 'いぬ', content: 'いぬ (inu) - dog', type: 'text', order: 1 },
-        { title: 'ねこ', content: 'ねこ (neko) - cat', type: 'text', order: 2 },
-        { title: 'みず', content: 'みず (mizu) - water', type: 'text', order: 3 },
-        { title: 'たべる', content: 'たべる (taberu) - to eat', type: 'text', order: 4 },
-        { title: 'のむ', content: 'のむ (nomu) - to drink', type: 'text', order: 5 },
-    ];
-
-    for (const item of beginnerVocab) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: beginnerModule1.id,
+    // Helper to add content and questions
+    const addContentAndQuestions = async (moduleId: string, content: any[], questions: any[]) => {
+        // Add content
+        for (const item of content) {
+            await prisma.contentItem.upsert({
+                where: {
+                    moduleId_order: {
+                        moduleId: moduleId,
+                        order: item.order,
+                    },
+                },
+                update: {
+                    title: item.title,
+                    content: item.content,
+                    type: item.type,
+                },
+                create: {
+                    moduleId: moduleId,
+                    title: item.title,
+                    content: item.content,
+                    type: item.type,
                     order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: beginnerModule1.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Beginner Module 2: Corresponding Kanji Content
-    console.log('Adding content to Beginner Module 2...');
-    const beginnerKanji = [
-        { title: '犬', content: '犬 (inu) - dog (kanji form)', type: 'text', order: 1 },
-        { title: '猫', content: '猫 (neko) - cat (kanji form)', type: 'text', order: 2 },
-        { title: '水', content: '水 (mizu) - water (kanji form)', type: 'text', order: 3 },
-        { title: '食べる', content: '食べる (taberu) - to eat (kanji form)', type: 'text', order: 4 },
-        { title: '飲む', content: '飲む (nomu) - to drink (kanji form)', type: 'text', order: 5 },
-    ];
-
-    for (const item of beginnerKanji) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: beginnerModule2.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: beginnerModule2.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Beginner Module 3: Simple Sentence Formation
-    console.log('Adding content to Beginner Module 3...');
-    const beginnerSentences = [
-        { title: 'いぬをみる', content: 'いぬをみる (inu wo miru) - I see a dog', type: 'text', order: 1 },
-        { title: 'ねこがたべる', content: 'ねこがたべる (neko ga taberu) - The cat eats', type: 'text', order: 2 },
-        { title: 'みずをのむ', content: 'みずをのむ (mizu wo nomu) - I drink water', type: 'text', order: 3 },
-        { title: 'たべものをたべる', content: 'たべものをたべる (tabemono wo taberu) - I eat food', type: 'text', order: 4 },
-        { title: 'いぬとねこ', content: 'いぬとねこ (inu to neko) - dog and cat', type: 'text', order: 5 },
-    ];
-
-    for (const item of beginnerSentences) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: beginnerModule3.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: beginnerModule3.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Intermediate Module 1: Expanded Vocabulary
-    console.log('Adding content to Intermediate Module 1...');
-    const intermediateVocab = [
-        { title: '学校', content: '学校 (gakkou) - school', type: 'text', order: 1 },
-        { title: '学生', content: '学生 (gakusei) - student', type: 'text', order: 2 },
-        { title: '勉強', content: '勉強 (benkyou) - study', type: 'text', order: 3 },
-        { title: '友達', content: '友達 (tomodachi) - friend', type: 'text', order: 4 },
-        { title: '家族', content: '家族 (kazoku) - family', type: 'text', order: 5 },
-    ];
-
-    for (const item of intermediateVocab) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: intermediateModule1.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: intermediateModule1.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Intermediate Module 2: Grammar Patterns
-    console.log('Adding content to Intermediate Module 2...');
-    const grammarPatterns = [
-        { title: '～ています', content: '～ています (te imasu) - present continuous form', type: 'text', order: 1 },
-        { title: '～ました', content: '～ました (mashita) - past tense polite form', type: 'text', order: 2 },
-        { title: '～が', content: '～が (ga) - subject particle', type: 'text', order: 3 },
-        { title: '～を', content: '～を (wo) - object particle', type: 'text', order: 4 },
-        { title: '～に', content: '～に (ni) - direction/time particle', type: 'text', order: 5 },
-    ];
-
-    for (const item of grammarPatterns) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: intermediateModule2.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: intermediateModule2.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Intermediate Module 3: Sentence Building
-    console.log('Adding content to Intermediate Module 3...');
-    const intermediateSentences = [
-        { title: '学校に行きます', content: '学校に行きます (gakkou ni ikimasu) - I go to school', type: 'text', order: 1 },
-        { title: '勉強しています', content: '勉強しています (benkyou shite imasu) - I am studying', type: 'text', order: 2 },
-        { title: '友達と話しました', content: '友達と話しました (tomodachi to hanashimashita) - I talked with a friend', type: 'text', order: 3 },
-        { title: '家族と食べました', content: '家族と食べました (kazoku to tabemashita) - I ate with my family', type: 'text', order: 4 },
-        { title: '学生が読んでいます', content: '学生が読んでいます (gakusei ga yonde imasu) - The student is reading', type: 'text', order: 5 },
-    ];
-
-    for (const item of intermediateSentences) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: intermediateModule3.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: intermediateModule3.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Advanced Module 1: Contextual Reading
-    console.log('Adding content to Advanced Module 1...');
-    const contextualReading = [
-        { title: '短文読解 1', content: '昨日、公園で友達とサッカーをしました。とても楽しかったです。', type: 'text', order: 1 },
-        { title: '短文読解 2', content: '今日は雨が降っています。傘を持って出かけました。', type: 'text', order: 2 },
-        { title: '短文読解 3', content: '図書館で本を借りました。来週までに返さなければなりません。', type: 'text', order: 3 },
-        { title: '短文読解 4', content: '新しいレストランに行きました。料理がとても美味しかったです。', type: 'text', order: 4 },
-        { title: '短文読解 5', content: '週末に映画を見に行く予定です。友達と一緒に行きます。', type: 'text', order: 5 },
-    ];
-
-    for (const item of contextualReading) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: advancedModule1.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: advancedModule1.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Advanced Module 2: Complex Sentence Interpretation
-    console.log('Adding content to Advanced Module 2...');
-    const complexSentences = [
-        { title: '複文 1', content: 'もし時間があれば、博物館に行きたいと思います。', type: 'text', order: 1 },
-        { title: '複文 2', content: '彼が来るまで、ここで待っていてください。', type: 'text', order: 2 },
-        { title: '複文 3', content: '勉強すればするほど、日本語が上手になります。', type: 'text', order: 3 },
-        { title: '複文 4', content: '天気が良ければ、ピクニックに行くつもりです。', type: 'text', order: 4 },
-        { title: '複文 5', content: 'この本を読んだ後で、感想を聞かせてください。', type: 'text', order: 5 },
-    ];
-
-    for (const item of complexSentences) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: advancedModule2.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: advancedModule2.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Advanced Module 3: Meaning & Inference
-    console.log('Adding content to Advanced Module 3...');
-    const inferenceContent = [
-        { title: '推論問題 1', content: '彼は毎日図書館に通っている。推論：彼は勉強熱心だ。', type: 'text', order: 1 },
-        { title: '推論問題 2', content: 'このレストランはいつも満席だ。推論：料理が人気だ。', type: 'text', order: 2 },
-        { title: '推論問題 3', content: '彼女は日本語を話せるが、まだ勉強している。推論：上達したいと思っている。', type: 'text', order: 3 },
-        { title: '推論問題 4', content: 'この本は難しいが、面白い。推論：読む価値がある。', type: 'text', order: 4 },
-        { title: '推論問題 5', content: '雨が降っているのに、彼は出かけた。推論：重要な用事がある。', type: 'text', order: 5 },
-    ];
-
-    for (const item of inferenceContent) {
-        await prisma.contentItem.upsert({
-            where: {
-                moduleId_order: {
-                    moduleId: advancedModule3.id,
-                    order: item.order,
-                },
-            },
-            update: {
-                title: item.title,
-                content: item.content,
-                type: item.type,
-            },
-            create: {
-                moduleId: advancedModule3.id,
-                title: item.title,
-                content: item.content,
-                type: item.type,
-                order: item.order,
-            },
-        });
-    }
-
-    // Create empty Quiz placeholders for all modules
-    console.log('Creating quiz placeholders...');
-    const modules = [
-        { id: beginnerModule1.id, title: 'Basic Vocabulary Quiz' },
-        { id: beginnerModule2.id, title: 'Corresponding Kanji Quiz' },
-        { id: beginnerModule3.id, title: 'Simple Sentence Formation Quiz' },
-        { id: intermediateModule1.id, title: 'Expanded Vocabulary Quiz' },
-        { id: intermediateModule2.id, title: 'Grammar Patterns Quiz' },
-        { id: intermediateModule3.id, title: 'Sentence Building Quiz' },
-        { id: advancedModule1.id, title: 'Contextual Reading Quiz' },
-        { id: advancedModule2.id, title: 'Complex Sentence Interpretation Quiz' },
-        { id: advancedModule3.id, title: 'Meaning & Inference Quiz' },
-    ];
-
-    for (const module of modules) {
-        // Check if quiz already exists for this module
-        const existingQuiz = await prisma.quiz.findFirst({
-            where: { moduleId: module.id },
-        });
-
-        if (existingQuiz) {
-            // Update existing quiz
-            await prisma.quiz.update({
-                where: { id: existingQuiz.id },
-                data: {
-                    title: module.title,
-                    description: 'Quiz questions will be generated by AI',
-                },
-            });
-        } else {
-            // Create new quiz
-            await prisma.quiz.create({
-                data: {
-                    moduleId: module.id,
-                    title: module.title,
-                    description: 'Quiz questions will be generated by AI',
                 },
             });
         }
-    }
+
+        // Create or get Quiz
+        let quiz = await prisma.quiz.findFirst({
+            where: { moduleId: moduleId },
+        });
+
+        if (!quiz) {
+            quiz = await prisma.quiz.create({
+                data: {
+                    moduleId: moduleId,
+                    title: 'Module Quiz',
+                    description: 'Test your knowledge of this module',
+                },
+            });
+        }
+
+        // Add Questions
+        for (let i = 0; i < questions.length; i++) {
+            const q = questions[i];
+            await prisma.quizQuestion.upsert({
+                where: {
+                    quizId_order: {
+                        quizId: quiz.id,
+                        order: i + 1,
+                    },
+                },
+                update: {
+                    question: q.question,
+                    options: q.options,
+                    correctAnswer: q.correctAnswer,
+                },
+                create: {
+                    quizId: quiz.id,
+                    question: q.question,
+                    type: 'multiple_choice',
+                    options: q.options,
+                    correctAnswer: q.correctAnswer,
+                    order: i + 1,
+                },
+            });
+        }
+    };
+
+    // Beginner Module 1
+    await addContentAndQuestions(
+        beginnerModule1.id,
+        [
+            { title: 'いぬ', content: 'いぬ (inu) - dog', type: 'text', order: 1 },
+            { title: 'ねこ', content: 'ねこ (neko) - cat', type: 'text', order: 2 },
+        ],
+        [
+            {
+                question: 'What is the Japanese word for "dog"?',
+                options: ['いぬ', 'ねこ', 'みず', 'とり'],
+                correctAnswer: 'いぬ',
+            },
+        ]
+    );
+
+    // Beginner Module 2
+    await addContentAndQuestions(
+        beginnerModule2.id,
+        [
+            { title: '犬', content: '犬 (inu) - dog (kanji form)', type: 'text', order: 1 },
+            { title: '猫', content: '猫 (neko) - cat (kanji form)', type: 'text', order: 2 },
+        ],
+        [
+            {
+                question: 'What is the kanji for "cat"?',
+                options: ['犬', '猫', '水', '木'],
+                correctAnswer: '猫',
+            },
+        ]
+    );
+
+    // Beginner Module 3
+    await addContentAndQuestions(
+        beginnerModule3.id,
+        [
+            { title: 'いぬをみる', content: 'いぬをみる - I see a dog', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: 'How do you say "I see a dog" in Japanese?',
+                options: ['いぬをみる', 'ねこをみる', 'みずをのむ', 'ごはんをたべる'],
+                correctAnswer: 'いぬをみる',
+            },
+        ]
+    );
+
+    // Intermediate Module 1
+    await addContentAndQuestions(
+        intermediateModule1.id,
+        [
+            { title: '学校', content: '学校 (gakkou) - school', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: 'What does "学校" (gakkou) mean?',
+                options: ['School', 'Hospital', 'Library', 'Station'],
+                correctAnswer: 'School',
+            },
+            {
+                question: 'Which word means "student" in Japanese?',
+                options: ['学生', '先生', '学校', '勉強'],
+                correctAnswer: '学生',
+            },
+        ]
+    );
+
+    // Intermediate Module 2
+    await addContentAndQuestions(
+        intermediateModule2.id,
+        [
+            { title: '～ています', content: '～ています - present continuous', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: 'Which particle is used to indicate the object of a verb?',
+                options: ['を', 'が', 'に', 'で'],
+                correctAnswer: 'を',
+            },
+            {
+                question: 'What is the polite past tense form of a verb?',
+                options: ['～ました', '～ます', '～ません', '～ましょう'],
+                correctAnswer: '～ました',
+            },
+        ]
+    );
+
+    // Intermediate Module 3
+    await addContentAndQuestions(
+        intermediateModule3.id,
+        [
+            { title: '学校に行きます', content: '学校に行きます - I go to school', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: 'How do you say "I am studying" in Japanese?',
+                options: ['勉強しています', '勉強しました', '勉強します', '勉強したい'],
+                correctAnswer: '勉強しています',
+            },
+            {
+                question: 'How do you say "I talked with a friend"?',
+                options: ['友達と話しました', '友達に話しました', '友達が話しました', '友達を話しました'],
+                correctAnswer: '友達と話しました',
+            },
+        ]
+    );
+
+    // Advanced Module 1
+    await addContentAndQuestions(
+        advancedModule1.id,
+        [
+            { title: '読解', content: '昨日、公園で友達とサッカーをしました。', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: '昨日、どこでサッカーをしましたか？',
+                options: ['公園', '学校', '家', '海'],
+                correctAnswer: '公園',
+            },
+            {
+                question: 'サッカーをしたのはいつですか？',
+                options: ['昨日', '今日', '明日', '先週'],
+                correctAnswer: '昨日',
+            },
+        ]
+    );
+
+    // Advanced Module 2
+    await addContentAndQuestions(
+        advancedModule2.id,
+        [
+            { title: '複文', content: 'もし時間があれば、博物館に行きたいと思います。', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: '「もし時間があれば」の意味は何ですか？',
+                options: ['If there is time', 'When there is time', 'Because there is time', 'Although there is time'],
+                correctAnswer: 'If there is time',
+            },
+            {
+                question: '「博物館に行きたい」の意味は何ですか？',
+                options: ['I want to go to the museum', 'I went to the museum', 'I am going to the museum', 'I should go to the museum'],
+                correctAnswer: 'I want to go to the museum',
+            },
+        ]
+    );
+
+    // Advanced Module 3
+    await addContentAndQuestions(
+        advancedModule3.id,
+        [
+            { title: '推論', content: '彼は毎日図書館に通っている。', type: 'text', order: 1 },
+        ],
+        [
+            {
+                question: '「彼は毎日図書館に通っている」から推論できることは何ですか？',
+                options: ['彼は勉強熱心だ', '彼は泳ぐのが好きだ', '彼は料理が得意だ', '彼は歌が上手だ'],
+                correctAnswer: '彼は勉強熱心だ',
+            },
+            {
+                question: '「雨が降っているのに、彼は出かけた」から推論できることは何ですか？',
+                options: ['重要な用事がある', '彼は雨が好きだ', '彼は傘を持っていない', '彼は暇だ'],
+                correctAnswer: '重要な用事がある',
+            },
+        ]
+    );
 
     console.log('Seed completed successfully!');
 }
@@ -537,4 +434,3 @@ main()
     .finally(async () => {
         await prisma.$disconnect();
     });
-

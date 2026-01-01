@@ -12,6 +12,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from '@/components/ui/button';
 
 interface Quiz {
     id: string;
@@ -37,6 +45,7 @@ interface UserProgress {
         moduleId: string;
         completed: boolean;
         progress: number;
+        unlocked: boolean;
     }>;
     levelStatus: Array<{
         levelId: string;
@@ -91,29 +100,30 @@ export default function LearningSidebar() {
 
     const isLevelUnlocked = (levelId: string) => {
         if (!progress) return false;
-        // First level is always unlocked if no status exists
-        const firstLevel = levels[0];
-        if (firstLevel && firstLevel.id === levelId && progress.levelStatus.length === 0) return true;
 
         const status = progress.levelStatus.find(s => s.levelId === levelId);
-        return status?.unlocked || false;
+        if (status) return status.unlocked;
+
+        const firstLevel = levels[0];
+        return firstLevel?.id === levelId;
     };
 
     const isModuleUnlocked = (moduleId: string, levelId: string) => {
         if (!progress) return false;
+
+        const moduleProgress = progress.moduleProgress.find(p => p.moduleId === moduleId);
+        if (moduleProgress?.unlocked) return true;
+
         if (!isLevelUnlocked(levelId)) return false;
 
-        // Find the module and its order
         const level = levels.find(l => l.id === levelId);
         if (!level) return false;
 
         const module = level.modules.find(m => m.id === moduleId);
         if (!module) return false;
 
-        // First module of an unlocked level is unlocked
         if (module.order === 1) return true;
 
-        // Other modules are unlocked if the previous module is completed
         const prevModule = level.modules.find(m => m.order === module.order - 1);
         if (!prevModule) return true;
 
@@ -134,8 +144,8 @@ export default function LearningSidebar() {
         return <div className="p-4 text-sm text-muted-foreground">Loading path...</div>;
     }
 
-    return (
-        <div className="w-64 border-r bg-card h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto hidden md:block">
+    const SidebarContent = () => (
+        <div className="flex flex-col h-full bg-card">
             <div className="p-4 border-b space-y-2">
                 <Link
                     to="/learning-path"
@@ -150,7 +160,7 @@ export default function LearningSidebar() {
                 </h2>
             </div>
 
-            <div className="py-2">
+            <div className="py-2 flex-1 overflow-y-auto">
                 {levels.map((level) => {
                     const unlocked = isLevelUnlocked(level.id);
                     const expanded = expandedLevels[level.id];
@@ -198,7 +208,6 @@ export default function LearningSidebar() {
                                                     onClick={(e) => {
                                                         if (!moduleUnlocked) {
                                                             e.preventDefault();
-                                                            // We'll handle this with a custom event or state in the parent
                                                             window.dispatchEvent(new CustomEvent('show-locked-module', {
                                                                 detail: { moduleTitle: module.title, levelTitle: level.title }
                                                             }));
@@ -222,7 +231,6 @@ export default function LearningSidebar() {
                                                     )}
                                                 </Link>
 
-                                                {/* Quiz Link if module is unlocked */}
                                                 {moduleUnlocked && module.quizzes.length > 0 && (
                                                     <Link
                                                         to={`/quiz/${level.title.toLowerCase()}/${module.id}`}
@@ -245,5 +253,31 @@ export default function LearningSidebar() {
                 })}
             </div>
         </div>
+    );
+
+    return (
+        <>
+            {/* Desktop Sidebar */}
+            <div className="w-64 border-r bg-card h-[calc(100vh-3.5rem)] sticky top-14 overflow-hidden hidden md:block">
+                <SidebarContent />
+            </div>
+
+            {/* Mobile Sidebar Trigger */}
+            <div className="md:hidden fixed bottom-6 right-6 z-40">
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button size="icon" className="h-14 w-14 rounded-full shadow-2xl bg-primary text-primary-foreground">
+                            <BookOpen className="h-6 w-6" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0 w-72">
+                        <SheetHeader className="sr-only">
+                            <SheetTitle>Learning Path</SheetTitle>
+                        </SheetHeader>
+                        <SidebarContent />
+                    </SheetContent>
+                </Sheet>
+            </div>
+        </>
     );
 }

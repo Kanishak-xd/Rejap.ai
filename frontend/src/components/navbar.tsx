@@ -6,8 +6,6 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuContent,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import {
   DropdownMenu,
@@ -63,13 +61,13 @@ export default function Navbar() {
   useEffect(() => {
     checkAuth()
     fetchLevels()
-    
+
     // Refresh auth state when window regains focus (e.g., after OAuth redirect)
     const handleFocus = () => {
       checkAuth()
     }
     window.addEventListener('focus', handleFocus)
-    
+
     // Also check on page visibility change
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -77,7 +75,7 @@ export default function Navbar() {
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    
+
     return () => {
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -197,50 +195,21 @@ export default function Navbar() {
 
   // Desktop navigation structure
   const desktopNavItems = [
-    {
-      href: "#",
-      label: "Lessons",
-      gridCols: 2,
-      categories: [
-        {
-          name: "Levels",
-          id: "levels",
-          items: levels.length > 0
-            ? levels.map((level) => ({
-                title: level.title,
-                description: `Learn ${level.title.toLowerCase()} level content`,
-                href: `/learn/${level.id}`,
-              }))
-            : [{ title: "No levels available", description: "", href: "#" }],
-        },
-        {
-          name: "Modules",
-          id: "modules",
-          items: modules.length > 0
-            ? modules.slice(0, 6).map((module) => ({
-                title: module.title,
-                description: `Module in ${module.level.title}`,
-                href: `/learn/${module.levelId}/${module.id}`,
-              }))
-            : [{ title: "No modules available", description: "", href: "#" }],
-        },
-      ],
-    },
-    { href: "/about", label: "About", active: false },
+    { href: "/learning-path", label: "Learning Path", active: location.pathname === "/learning-path" },
+    { href: "/about", label: "About", active: location.pathname === "/about" },
   ]
 
   return (
-    <header className="container mx-auto flex h-14 items-center justify-between gap-4 border-b relative z-50 bg-background">
+    <header className="container mx-auto flex h-14 items-center justify-between gap-4 border-b relative z-50 bg-background sticky top-0 px-4">
       <div className="flex items-center justify-start gap-2">
-        <MobileNav nav={mobileNavItems} />
+        <MobileNav
+          nav={mobileNavItems}
+          user={user}
+          onSignOut={handleSignOut}
+          onSignIn={handleSignIn}
+        />
 
-        <Link
-          to="/"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "icon" }),
-            "dark:hover:bg-accent text-accent-foreground [&_svg:not([class*='size-'])]:size-6"
-          )}
-        >
+        <Link to="/" className="dark:hover:bg-accent text-accent-foreground px-4 py-0.5 rounded-sm">
           <span className="text-lg font-bold font-['Roboto']">rejap.ai</span>
         </Link>
       </div>
@@ -248,67 +217,26 @@ export default function Navbar() {
       <NavigationMenu className="max-md:hidden relative z-50" viewport={true}>
         <NavigationMenuList>
           {user ? (
-            desktopNavItems.map((link, index) => {
-              if (link.categories && link.categories?.length > 0) {
-                return (
-                  <NavigationMenuItem key={index}>
-                    <NavigationMenuTrigger className="h-8 rounded-md px-3 py-1.5 font-medium">
-                      {link.label}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent
-                      className={cn(
-                        "z-50 p-3 pb-0 md:w-[400px]",
-                        link.gridCols === 2 &&
-                          "columns-2 gap-4 lg:w-[500px]",
-                        link.gridCols === 3 &&
-                          "columns-3 gap-4 lg:w-[600px]"
-                      )}
-                    >
-                      {link.categories.map((category) => (
-                        <div
-                          key={category.id}
-                          className="mb-3 break-inside-avoid"
-                        >
-                          <h3 className="text-foreground/70 mb-3 px-2 text-sm font-light">
-                            {category.name}
-                          </h3>
-                          <ul className="grid gap-1">
-                            {category.items.map((item) => (
-                              <ListItem
-                                key={item.title}
-                                title={item.title}
-                                href={item.href}
-                              >
-                                {item.description}
-                              </ListItem>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                )
-              }
-
-              return (
-                <NavigationMenuItem key={index}>
-                  <NavigationMenuLink
-                    href={link.href}
-                    asChild
-                    data-active={link.active}
-                    className="rounded-md px-3 py-1.5 font-medium"
-                  >
-                    <Link to={link.href}>{link.label}</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              )
-            })
+            desktopNavItems.map((link, index) => (
+              <NavigationMenuItem key={index}>
+                <NavigationMenuLink
+                  asChild
+                  data-active={link.active}
+                  className={cn(
+                    "rounded-sm px-3 py-1.5 font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                    link.active && "bg-accent text-accent-foreground"
+                  )}
+                >
+                  <Link to={link.href}>{link.label}</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))
           ) : (
             <NavigationMenuItem>
               <NavigationMenuLink
                 href="/about"
                 asChild
-                className="rounded-md px-3 py-1.5 font-medium"
+                className="rounded-xs px-3 py-1.5 font-medium"
               >
                 <Link to="/about">About</Link>
               </NavigationMenuLink>
@@ -363,26 +291,6 @@ export default function Navbar() {
         )}
       </div>
     </header>
-  )
-}
-
-function ListItem({
-  title,
-  children,
-  href,
-  ...props
-}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
-  return (
-    <li {...props}>
-      <NavigationMenuLink asChild>
-        <Link to={href}>
-          <div className="text-sm leading-none font-medium">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-xs leading-snug">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
   )
 }
 

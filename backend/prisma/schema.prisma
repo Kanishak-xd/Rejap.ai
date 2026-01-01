@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,47 +8,39 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  googleId      String?   @unique @map("google_id")
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  name          String?
-  image         String?   // Auth.js uses 'image', we also store in profileImage
-  profileImage  String?   @map("profile_image") // Our app-specific field
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  // Application fields
-  currentLevelId String?   @map("current_level_id")
-
-  // Auth.js relations
-  accounts     Account[]
-  sessions     Session[]
-
-  // Application relations
-  moduleProgress   UserModuleProgress[]
-  quizAttempts     UserQuizAttempt[]
-  levelStatus      UserLevelStatus[]
-  currentLevel     Level?    @relation("UserCurrentLevel", fields: [currentLevelId], references: [id])
+  id             String               @id @default(uuid())
+  googleId       String?              @unique @map("google_id")
+  email          String?              @unique
+  name           String?
+  profileImage   String?              @map("profile_image")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+  emailVerified  DateTime?            @map("email_verified")
+  image          String?
+  currentLevelId String?              @map("current_level_id")
+  accounts       Account[]
+  sessions       Session[]
+  levelStatus    UserLevelStatus[]
+  moduleProgress UserModuleProgress[]
+  quizAttempts   UserQuizAttempt[]
+  currentLevel   Level?               @relation("UserCurrentLevel", fields: [currentLevelId], references: [id])
 
   @@map("users")
 }
 
-// Auth.js required models
 model Account {
   id                String  @id @default(uuid())
   userId            String  @map("user_id")
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text @map("refresh_token")
-  access_token      String? @db.Text @map("access_token")
+  refresh_token     String? @map("refresh_token")
+  access_token      String? @map("access_token")
   expires_at        Int?    @map("expires_at")
   token_type        String? @map("token_type")
   scope             String?
-  id_token          String? @db.Text @map("id_token")
+  id_token          String? @map("id_token")
   session_state     String? @map("session_state")
-  
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -78,35 +67,31 @@ model VerificationToken {
 }
 
 model Level {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  order       Int      @unique
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
+  id           String            @id @default(uuid())
+  title        String
+  description  String?
+  order        Int               @unique
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
   modules      Module[]
   userStatuses UserLevelStatus[]
-  currentUsers User[]   @relation("UserCurrentLevel")
+  currentUsers User[]            @relation("UserCurrentLevel")
 
   @@map("levels")
 }
 
 model Module {
-  id          String   @id @default(uuid())
-  levelId     String   @map("level_id")
-  title       String
-  description String?
-  order       Int
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  level         Level         @relation(fields: [levelId], references: [id], onDelete: Cascade)
-  contentItems  ContentItem[]
-  quizzes       Quiz[]
-  userProgress  UserModuleProgress[]
+  id           String               @id @default(uuid())
+  levelId      String               @map("level_id")
+  title        String
+  description  String?
+  order        Int
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+  contentItems ContentItem[]
+  level        Level                @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  quizzes      Quiz[]
+  userProgress UserModuleProgress[]
 
   @@unique([levelId, order])
   @@map("modules")
@@ -116,138 +101,122 @@ model ContentItem {
   id        String   @id @default(uuid())
   moduleId  String   @map("module_id")
   title     String
-  content   String   @db.Text
-  type      String   // e.g., "text", "video", "image", "code"
+  content   String
+  type      String
   order     Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([moduleId, order])
   @@map("content_items")
 }
 
 model Quiz {
-  id          String   @id @default(uuid())
-  moduleId    String   @map("module_id")
-  title       String
-  description String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  module       Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  id           String            @id @default(uuid())
+  moduleId     String            @map("module_id")
+  title        String
+  description  String?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
   questions    QuizQuestion[]
+  module       Module            @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   userAttempts UserQuizAttempt[]
 
   @@map("quizzes")
 }
 
 model QuizQuestion {
-  id          String   @id @default(uuid())
-  quizId      String   @map("quiz_id")
-  question    String   @db.Text
-  type        String   // e.g., "multiple_choice", "true_false", "short_answer"
-  options     Json?    // For multiple choice questions
-  correctAnswer String @map("correct_answer") @db.Text
-  order       Int
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  userAnswers UserAnswer[]
+  id            String       @id @default(uuid())
+  quizId        String       @map("quiz_id")
+  question      String
+  type          String
+  options       Json?
+  correctAnswer String       @map("correct_answer")
+  order         Int
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userAnswers   UserAnswer[]
 
   @@unique([quizId, order])
   @@map("quiz_questions")
 }
 
 model UserModuleProgress {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  moduleId   String   @map("module_id")
-  completed  Boolean  @default(false)
-  unlocked   Boolean  @default(false)
-  progress   Float    @default(0) // 0.0 to 1.0
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  moduleId    String    @map("module_id")
+  completed   Boolean   @default(false)
+  progress    Float     @default(0)
   completedAt DateTime? @map("completed_at")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  unlocked    Boolean   @default(false)
+  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, moduleId])
   @@map("user_module_progress")
 }
 
 model UserQuizAttempt {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  quizId     String   @map("quiz_id")
-  score      Float    // 0.0 to 1.0
-  answers    Json     // Store user's answers
-  completed  Boolean  @default(false)
-  completedAt DateTime? @map("completed_at")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  quizId      String       @map("quiz_id")
+  score       Float
+  answers     Json
+  completed   Boolean      @default(false)
+  completedAt DateTime?    @map("completed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
   userAnswers UserAnswer[]
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_quiz_attempts")
 }
 
 model UserAnswer {
-  id         String   @id @default(uuid())
-  attemptId  String   @map("attempt_id")
-  questionId String   @map("question_id")
-  userAnswer String   @db.Text @map("user_answer")
-  isCorrect  Boolean  @map("is_correct")
-  aiFeedbackId String? @unique @map("ai_feedback_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  attempt    UserQuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  question   QuizQuestion    @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  aiFeedback AiFeedback?     @relation(fields: [aiFeedbackId], references: [id], onDelete: SetNull)
+  id           String          @id @default(uuid())
+  attemptId    String          @map("attempt_id")
+  questionId   String          @map("question_id")
+  userAnswer   String          @map("user_answer")
+  isCorrect    Boolean         @map("is_correct")
+  aiFeedbackId String?         @unique @map("ai_feedback_id")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  aiFeedback   AiFeedback?     @relation(fields: [aiFeedbackId], references: [id])
+  attempt      UserQuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question     QuizQuestion    @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@map("user_answers")
 }
 
 model AiFeedback {
-  id         String   @id @default(uuid())
-  answerId   String   @unique @map("answer_id")
-  feedback   String   @db.Text
-  explanation String? @db.Text
-  suggestions String? @db.Text
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  userAnswer UserAnswer?
+  id          String      @id @default(uuid())
+  answerId    String      @unique @map("answer_id")
+  feedback    String
+  explanation String?
+  suggestions String?
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  userAnswer  UserAnswer?
 
   @@map("ai_feedback")
 }
 
 model UserLevelStatus {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  levelId    String   @map("level_id")
-  unlocked   Boolean  @default(false)
-  completed  Boolean  @default(false)
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  levelId     String    @map("level_id")
+  unlocked    Boolean   @default(false)
+  completed   Boolean   @default(false)
   completedAt DateTime? @map("completed_at")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  level Level @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  level       Level     @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, levelId])
   @@map("user_level_status")
