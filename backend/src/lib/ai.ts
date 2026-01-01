@@ -149,6 +149,7 @@ Requirements:
 - Explain why the correct answer is right
 - Use ONLY vocabulary and concepts from the allowed content
 - Do NOT introduce new Japanese words
+- The explanation MUST be written in ENGLISH, even if the question or answers are in Japanese.
 
 Provide only the explanation text, no additional formatting.`;
 
@@ -189,13 +190,13 @@ export async function analyzePerformance(
     scores: Array<{ module: string; score: number }>,
     incorrectSummary: string
 ): Promise<{ strengths: string[]; weakAreas: string[] }> {
-    const scoresText = scores.map(s => `${s.module}: ${(s.score * 100).toFixed(0)}%`).join('\n');
+    const scoresText = scores.map(s => `${s.module}: ${(s.score * 100).toFixed(0)}% `).join('\n');
 
     const prompt = `${SYSTEM_CONSTRAINT}
 
-You are a Japanese language learning analyst. Analyze the student's performance and identify strengths and weak areas.
+You are a Japanese language learning analyst.Analyze the student's performance and identify strengths and weak areas.
 
-Level: ${level}
+    Level: ${level}
 
 Module Scores:
 ${scoresText}
@@ -203,15 +204,15 @@ ${scoresText}
 Incorrect Answers Summary:
 ${incorrectSummary}
 
-Requirements:
-- Identify 2-3 key strengths
-- Identify 2-3 weak areas that need improvement
-- Be specific but encouraging
-- Return a JSON object with this exact structure:
-{
-  "strengths": ["Strength 1", "Strength 2"],
-  "weakAreas": ["Weak area 1", "Weak area 2"]
-}
+    Requirements:
+    - Identify 2 - 3 key strengths
+        - Identify 2 - 3 weak areas that need improvement
+            - Be specific but encouraging
+                - Return a JSON object with this exact structure:
+    {
+        "strengths": ["Strength 1", "Strength 2"],
+            "weakAreas": ["Weak area 1", "Weak area 2"]
+    }
 
 Return ONLY valid JSON, no additional text.`;
 
@@ -236,7 +237,7 @@ Return ONLY valid JSON, no additional text.`;
 
         logAIResponse('analyzePerformance', prompt, text, { level });
 
-        const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const cleanedText = text.replace(/```json\n ? /g, '').replace(/```\n?/g, '').trim();
         const analysis = JSON.parse(cleanedText);
 
         if (!analysis.strengths || !analysis.weakAreas) {
@@ -246,7 +247,7 @@ Return ONLY valid JSON, no additional text.`;
         return analysis;
     } catch (error) {
         console.error('Error analyzing performance:', error);
-        logAIResponse('analyzePerformance', prompt, `ERROR: ${error}`, { level });
+        logAIResponse('analyzePerformance', prompt, `ERROR: ${error} `, { level });
         return {
             strengths: ['You\'re making steady progress!'],
             weakAreas: ['Continue practicing the areas you found challenging.'],
@@ -266,9 +267,9 @@ export async function recommendNextSteps(
 
     const prompt = `${SYSTEM_CONSTRAINT}
 
-You are a motivational Japanese language learning coach. Write a 3-5 sentence summary encouraging the student and recommending next steps.
+You are a motivational Japanese language learning coach.Write a 3 - 5 sentence summary encouraging the student and recommending next steps.
 
-Level: ${level}
+        Level: ${level}
 
 Performance Summary:
 ${summary}
@@ -276,12 +277,12 @@ ${summary}
 Areas to Focus On:
 ${weakAreasText}
 
-Requirements:
-- Write 3-5 sentences
-- Be motivational and encouraging
-- Suggest specific next steps based on weak areas
-- Keep it positive and supportive
-- Do NOT introduce new Japanese words or concepts
+    Requirements:
+    - Write 3 - 5 sentences
+        - Be motivational and encouraging
+            - Suggest specific next steps based on weak areas
+                - Keep it positive and supportive
+                    - Do NOT introduce new Japanese words or concepts
 
 Provide only the recommendation text, no additional formatting.`;
 
@@ -309,7 +310,7 @@ Provide only the recommendation text, no additional formatting.`;
         return text;
     } catch (error) {
         console.error('Error recommending next steps:', error);
-        logAIResponse('recommendNextSteps', prompt, `ERROR: ${error}`, { level });
+        logAIResponse('recommendNextSteps', prompt, `ERROR: ${error} `, { level });
         return 'Keep up the great work! Continue practicing and you\'ll see improvement.';
     }
 }

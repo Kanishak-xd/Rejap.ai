@@ -8,7 +8,7 @@ export default function FeaturesSection() {
                 </div>
 
                 <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row gap-x-5 shadow-sm">
-                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#8BA8C7] flex items-center justify-center p-8">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#8BA8C7] dark:bg-[#2D3A4A] flex items-center justify-center p-8">
                         <div className="text-white text-center">
                             <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -25,7 +25,7 @@ export default function FeaturesSection() {
                 </div>
 
                 <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row-reverse gap-x-5 shadow-sm">
-                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#6B8E7B] flex items-center justify-center p-8">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#6B8E7B] dark:bg-[#2D3A32] flex items-center justify-center p-8">
                         <div className="text-white text-center">
                             <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -42,7 +42,7 @@ export default function FeaturesSection() {
                 </div>
 
                 <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row gap-x-5 shadow-sm">
-                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#F89B67] flex items-center justify-center p-8">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#F89B67] dark:bg-[#4A352D] flex items-center justify-center p-8">
                         <div className="text-white text-center">
                             <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -59,7 +59,7 @@ export default function FeaturesSection() {
                 </div>
 
                 <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row-reverse gap-x-5 shadow-sm">
-                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#C597B5] flex items-center justify-center p-8">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-[#C597B5] dark:bg-[#3D2D38] flex items-center justify-center p-8">
                         <div className="text-white text-center">
                             <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />

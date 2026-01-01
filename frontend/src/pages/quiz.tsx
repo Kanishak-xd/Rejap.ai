@@ -260,12 +260,16 @@ export default function Quiz() {
                 return (
                   <div key={question.id} className={cn(
                     "border rounded-xl p-4 sm:p-6 transition-all",
-                    isCorrect ? "bg-green-50/50 border-green-100" : "bg-orange-50/50 border-orange-100"
+                    isCorrect
+                      ? "bg-green-50/50 border-green-100 dark:bg-green-900/10 dark:border-green-900/30"
+                      : "bg-orange-50/50 border-orange-100 dark:bg-orange-900/10 dark:border-orange-900/30"
                   )}>
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className={cn(
                         "w-7 h-7 sm:w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1",
-                        isCorrect ? "bg-green-500 text-white" : "bg-orange-500 text-white"
+                        isCorrect
+                          ? "bg-green-500 text-white dark:bg-green-600"
+                          : "bg-orange-500 text-white dark:bg-orange-600"
                       )}>
                         {isCorrect ? <CheckCircle2 className="w-4 h-4 sm:w-5 h-5" /> : <XCircle className="w-4 h-4 sm:w-5 h-5" />}
                       </div>
@@ -274,26 +278,33 @@ export default function Quiz() {
                           {index + 1}. {question.question}
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                          <div className="p-3 rounded-lg bg-background/50 border">
+                          <div className="p-3 rounded-lg bg-background/50 border dark:bg-neutral-900/50 dark:border-neutral-700">
                             <span className="text-muted-foreground block mb-1">Your Answer</span>
-                            <span className={isCorrect ? 'text-green-700 font-medium' : 'text-orange-700 font-medium'}>
+                            <span className={cn(
+                              "font-medium",
+                              isCorrect
+                                ? "text-green-700 dark:text-green-400"
+                                : "text-orange-700 dark:text-orange-400"
+                            )}>
                               {selectedAnswers[question.id] || 'No answer'}
                             </span>
                           </div>
                           {!isCorrect && (
-                            <div className="p-3 rounded-lg bg-background/50 border">
+                            <div className="p-3 rounded-lg bg-background/50 border dark:bg-neutral-900/50 dark:border-neutral-700">
                               <span className="text-muted-foreground block mb-1">Correct Answer</span>
-                              <span className="text-green-700 font-medium">{question.correctAnswer}</span>
+                              <span className="text-green-700 dark:text-green-400 font-medium">
+                                {result?.correctAnswer || question.correctAnswer}
+                              </span>
                             </div>
                           )}
                         </div>
                         {!isCorrect && result?.feedback && (
-                          <div className="mt-4 p-4 bg-white/80 border border-orange-200 rounded-lg shadow-sm">
-                            <div className="flex items-center gap-2 text-orange-800 font-semibold mb-1 text-sm">
+                          <div className="mt-4 p-4 bg-white/80 border border-orange-200 rounded-lg shadow-sm dark:bg-neutral-900/80 dark:border-orange-900/30">
+                            <div className="flex items-center gap-2 text-orange-800 dark:text-orange-400 font-semibold mb-1 text-sm">
                               <Sparkles className="w-4 h-4" />
                               AI Explanation
                             </div>
-                            <p className="text-sm text-orange-900 leading-relaxed">{result.feedback}</p>
+                            <p className="text-sm text-orange-900 dark:text-orange-200 leading-relaxed">{result.feedback}</p>
                           </div>
                         )}
                       </div>

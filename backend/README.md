@@ -74,8 +74,20 @@ On first successful Google login:
 - `GET /api` - API information
 - `GET /api/auth/*` - Authentication endpoints (handled by Auth.js)
 - `GET /api/me` - Get current authenticated user
+- `GET /api/quiz` - Fetch quiz for a module (generates questions via AI if missing)
+- `POST /api/quiz/submit` - Submit quiz answers, get AI feedback, and update progress
+- `GET /api/quiz/diagnostic` - Get 10 balanced questions for initial assessment
+- `POST /api/quiz/diagnostic` - Submit diagnostic quiz and get assigned a level
+- `GET /api/learning/path` - Get the full learning path with locked/unlocked status
+- `GET /api/user/progress` - Get detailed user progress across all modules
 
-More routes will be added as development progresses.
+## AI Integration
+
+The backend integrates with **Groq AI (Llama 3.3 70B)** for:
+- **Quiz Generation**: Dynamically creating questions based on module content.
+- **Explain Answer**: Providing supportive, English-language explanations for incorrect answers.
+- **Performance Analysis**: Identifying strengths and weak areas based on quiz results.
+- **Motivational Coaching**: Recommending next steps and providing encouragement.
 
 ## Environment Variables
 
@@ -85,4 +97,5 @@ Required environment variables:
 - `AUTH_URL` - Base URL of the application
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+- `GROQ_API_KEY` - API key for Groq AI integration
 - `PORT` - Server port (default: 3000)

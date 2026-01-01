@@ -288,6 +288,7 @@ router.post('/submit', requireAuth, async (req: AuthenticatedRequest, res: Respo
             resultsWithFeedback.push({
                 questionId: result.questionId,
                 correct: result.correct,
+                correctAnswer: result.correctAnswer,
                 feedback: feedbackText,
             });
         }
