@@ -6,12 +6,31 @@ import { syncUserFromAuth } from "./user-sync.js";
 
 const prisma = new PrismaClient();
 
+// Validate required environment variables
+if (!process.env.AUTH_SECRET) {
+    throw new Error('AUTH_SECRET environment variable is required');
+}
+if (!process.env.GOOGLE_CLIENT_ID) {
+    throw new Error('GOOGLE_CLIENT_ID environment variable is required');
+}
+if (!process.env.GOOGLE_CLIENT_SECRET) {
+    throw new Error('GOOGLE_CLIENT_SECRET environment variable is required');
+}
+
+// Log configuration (without sensitive data)
+console.log('Auth.js Configuration:');
+console.log(`  Base Path: (auto-detect from mount)`);
+console.log(`  Base URL: ${process.env.AUTH_URL || 'auto-detect'}`);
+console.log(`  Google Client ID: ${process.env.GOOGLE_CLIENT_ID.substring(0, 20)}...`);
+console.log(`  Trust Host: true`);
+
 const authConfig: any = {
     adapter: PrismaAdapter(prisma),
     providers: [
         Google({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            id: 'google',
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             allowDangerousEmailAccountLinking: true,
         }),
     ],
@@ -41,9 +60,35 @@ const authConfig: any = {
             }
             return session;
         },
+        async redirect({ url, baseUrl }) {
+            // Redirect to frontend after successful authentication
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
+            
+            // If there's a callback URL parameter, use it (allows custom redirects)
+            if (url && url !== baseUrl) {
+                // Check if URL is relative - make it absolute to frontend
+                if (url.startsWith("/")) {
+                    return `${frontendUrl}${url}`
+                }
+                // If it's an absolute URL to our backend, redirect to frontend root
+                try {
+                    const urlObj = new URL(url)
+                    if (urlObj.origin === baseUrl) {
+                        return frontendUrl
+                    }
+                } catch {
+                    // Invalid URL, redirect to frontend
+                    return frontendUrl
+                }
+            }
+            
+            // Default: redirect to frontend
+            return frontendUrl
+        },
     },
     secret: process.env.AUTH_SECRET,
     trustHost: true,
+    basePath: '/api/auth',
 };
 
 export const auth = ExpressAuth(authConfig);

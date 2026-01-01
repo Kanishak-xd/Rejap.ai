@@ -12,7 +12,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "db:cleanup": "tsx src/scripts/cleanup-auth.ts"
+    "db:cleanup": "tsx src/scripts/cleanup-auth.ts",
+    "check-env": "tsx src/scripts/check-env.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
