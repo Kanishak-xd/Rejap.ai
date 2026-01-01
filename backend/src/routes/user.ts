@@ -34,8 +34,8 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) 
 
         // Find current assigned level (the highest unlocked level)
         // If levelStatus is empty array, currentLevel will be null (new user state)
-        const currentLevel = user.levelStatus.length === 0 
-            ? null 
+        const currentLevel = user.levelStatus.length === 0
+            ? null
             : user.levelStatus
                 .filter(status => status.unlocked)
                 .sort((a, b) => b.level.order - a.level.order)[0]?.level || null;

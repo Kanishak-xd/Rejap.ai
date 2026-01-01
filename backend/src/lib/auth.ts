@@ -12,10 +12,11 @@ const authConfig: any = {
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            allowDangerousEmailAccountLinking: true,
         }),
     ],
     callbacks: {
-        async signIn({ user, account }: any) {
+        async signIn({ user, account, profile }: any) {
             if (account?.provider === 'google' && account.providerAccountId && user.email) {
                 // After Auth.js creates/updates the user via PrismaAdapter,
                 // sync additional fields to our custom User model structure
@@ -40,9 +41,6 @@ const authConfig: any = {
             }
             return session;
         },
-    },
-    pages: {
-        signIn: '/auth/signin',
     },
     secret: process.env.AUTH_SECRET,
     trustHost: true,

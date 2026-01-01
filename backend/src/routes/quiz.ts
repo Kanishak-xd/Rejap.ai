@@ -1,6 +1,8 @@
 import { Router, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth.js';
+import { generateQuizQuestions, explainAnswer } from '../lib/ai.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -23,7 +25,7 @@ router.get('/quiz', requireAuth, async (req: AuthenticatedRequest, res: Response
             return res.status(400).json({ error: 'moduleId query parameter is required' });
         }
 
-        const quiz = await prisma.quiz.findFirst({
+        let quiz = await prisma.quiz.findFirst({
             where: { moduleId },
             include: {
                 questions: {
@@ -45,6 +47,71 @@ router.get('/quiz', requireAuth, async (req: AuthenticatedRequest, res: Response
 
         if (!quiz) {
             return res.status(404).json({ error: 'Quiz not found for this module' });
+        }
+
+        // If quiz has no questions, generate them using AI
+        if (quiz.questions.length === 0) {
+            try {
+                // Get module content for AI generation
+                const contentItems = await prisma.contentItem.findMany({
+                    where: { moduleId },
+                    orderBy: { order: 'asc' },
+                });
+
+                const allowedContent = contentItems.map(item => `${item.title}: ${item.content}`);
+
+                // Generate questions using AI
+                const aiQuestions = await generateQuizQuestions(
+                    quiz.module.level.title,
+                    quiz.module.title,
+                    allowedContent
+                );
+
+                // Store generated questions in database
+                for (let i = 0; i < aiQuestions.length; i++) {
+                    const q = aiQuestions[i];
+                    await prisma.quizQuestion.create({
+                        data: {
+                            quizId: quiz.id,
+                            question: q.question_text,
+                            type: 'multiple_choice',
+                            options: q.options,
+                            correctAnswer: q.correct_answer,
+                            order: i + 1,
+                        },
+                    });
+                }
+
+                // Reload quiz with new questions
+                const updatedQuiz = await prisma.quiz.findUnique({
+                    where: { id: quiz.id },
+                    include: {
+                        questions: {
+                            orderBy: { order: 'asc' },
+                        },
+                        module: {
+                            include: {
+                                level: {
+                                    select: {
+                                        id: true,
+                                        title: true,
+                                        order: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                });
+
+                if (!updatedQuiz) {
+                    return res.status(500).json({ error: 'Failed to generate quiz questions' });
+                }
+
+                quiz = updatedQuiz;
+            } catch (error) {
+                console.error('Error generating quiz questions:', error);
+                return res.status(500).json({ error: 'Failed to generate quiz questions' });
+            }
         }
 
         // Return quiz without correct answers for security
@@ -142,6 +209,66 @@ router.post('/quiz/submit', requireAuth, async (req: AuthenticatedRequest, res: 
                 completedAt: new Date(),
             },
         });
+
+        // Get module content for AI feedback
+        const contentItems = await prisma.contentItem.findMany({
+            where: { moduleId },
+            orderBy: { order: 'asc' },
+        });
+        const allowedContent = contentItems.map(item => `${item.title}: ${item.content}`);
+
+        // Store individual answers and generate AI feedback for incorrect answers
+        const incorrectAnswers: string[] = [];
+        for (let i = 0; i < answerResults.length; i++) {
+            const result = answerResults[i];
+            if (!result.questionId) continue;
+
+            const question = quiz.questions[i];
+            if (!question) continue;
+
+            // Store user answer in database
+            const userAnswerRecord = await prisma.userAnswer.create({
+                data: {
+                    attemptId: attempt.id,
+                    questionId: result.questionId,
+                    userAnswer: result.userAnswer,
+                    isCorrect: result.correct,
+                },
+            });
+
+            // Generate AI feedback for incorrect answers
+            if (!result.correct) {
+                try {
+                    const explanation = await explainAnswer(
+                        quiz.module.level.title,
+                        question.question,
+                        result.userAnswer,
+                        result.correctAnswer,
+                        allowedContent
+                    );
+
+                    // Store AI feedback
+                    const aiFeedback = await prisma.aiFeedback.create({
+                        data: {
+                            answerId: userAnswerRecord.id,
+                            feedback: explanation,
+                            explanation: `The correct answer is: ${result.correctAnswer}`,
+                        },
+                    });
+
+                    // Link feedback to user answer
+                    await prisma.userAnswer.update({
+                        where: { id: userAnswerRecord.id },
+                        data: { aiFeedbackId: aiFeedback.id },
+                    });
+
+                    incorrectAnswers.push(`${question.question}: ${result.userAnswer} (Correct: ${result.correctAnswer})`);
+                } catch (error) {
+                    console.error('Error generating AI feedback:', error);
+                    // Continue even if AI feedback fails
+                }
+            }
+        }
 
         // Update module progress
         let moduleProgress = await prisma.userModuleProgress.findFirst({

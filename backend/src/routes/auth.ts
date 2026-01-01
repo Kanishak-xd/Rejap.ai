@@ -7,6 +7,8 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Mount Auth.js routes - this handles all /auth/* endpoints (signin, callback, signout, etc.)
+// Auth.js expects routes like /api/auth/signin, /api/auth/callback/google, etc.
+// Mount at /auth so it becomes /api/auth when router is mounted at /api
 router.use('/auth', auth);
 
 // Get current user endpoint
