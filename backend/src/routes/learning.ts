@@ -5,6 +5,33 @@ import { requireAuth, AuthenticatedRequest } from '../middleware/auth.js';
 const router = Router();
 const prisma = new PrismaClient();
 
+// GET /api/learning/path - Return entire learning structure (levels with nested modules)
+router.get('/learning/path', async (req: Request, res: Response) => {
+    try {
+        const levels = await prisma.level.findMany({
+            orderBy: { order: 'asc' },
+            include: {
+                modules: {
+                    orderBy: { order: 'asc' },
+                    include: {
+                        quizzes: {
+                            select: {
+                                id: true,
+                                title: true,
+                            }
+                        }
+                    }
+                },
+            },
+        });
+
+        res.json(levels);
+    } catch (error) {
+        console.error('Error fetching learning path:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // GET /api/levels - Return all levels
 router.get('/levels', async (req: Request, res: Response) => {
     try {

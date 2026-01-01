@@ -1,53 +1,77 @@
 export default function FeaturesSection() {
     return (
-        <section id="features" className="py-8 px-4 lg:py-16 lg:px-8">
+        <section id="features" className="py-8 px-4 lg:py-16 lg:px-8 bg-neutral-50 dark:bg-neutral-900">
             <div className="container mx-auto space-y-8 lg:space-y-12 max-w-6xl">
-                <div className="flex flex-col overflow-hidden rounded-md lg:flex-row gap-x-5">
-                    <img src="https://res.cloudinary.com/dykzzd9sy/image/upload/v1761674556/luc1_bie7bf.png" alt="" className="h-64 sm:h-80 w-full object-cover lg:w-1/2" />
-                    <div className="flex flex-col justify-center flex-1 p-4 sm:p-6 text-center xl:text-left md:text-left sm:text-center">
-                        <h3 className="text-2xl sm:text-3xl font-bold">Mess Menu Notification</h3>
-                        <p className="my-4 sm:my-6 text-neutral-500 dark:text-white text-xl">Lucifer auto-sends the daily mess menu before meals</p>
-                        <div className="flex justify-center sm:justify-center md:justify-start xl:justify-start">
-                            <a href="https://discord.com/oauth2/authorize?client_id=1338873280941129789&permissions=257024&integration_type=0&scope=bot+applications.commands" className="px-10 py-3 m-0 text-lg font-semibold rounded-xl bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 hover:cursor-pointer">
-                                Add to Discord
-                            </a>
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Rejap.ai?</h2>
+                    <p className="text-lg text-neutral-600 dark:text-neutral-400">Everything you need to master Japanese, all in one place</p>
+                </div>
+
+                <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row gap-x-5 shadow-sm">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-8">
+                        <div className="text-white text-center">
+                            <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <p className="text-xl font-semibold">Structured Learning</p>
                         </div>
                     </div>
-                </div>
-                <div className="flex flex-col overflow-hidden rounded-md lg:flex-row-reverse">
-                    <img src="https://res.cloudinary.com/dykzzd9sy/image/upload/v1761674556/luc2_aa5nxe.png" alt="" className="h-64 sm:h-80 w-full object-cover lg:w-1/2" />
-                    <div className="flex flex-col justify-center flex-1 p-4 sm:p-6 text-center xl:text-left md:text-left sm:text-center">
-                        <h3 className="text-2xl sm:text-3xl font-bold">Smart Reminders</h3>
-                        <p className="my-4 sm:my-6 text-neutral-500 dark:text-white text-xl">Reminders for daily classes, laundry, and TMP menu</p>
-                        <div className="flex justify-center sm:justify-center md:justify-start xl:justify-start">
-                            <a href="https://discord.com/oauth2/authorize?client_id=1338873280941129789&permissions=257024&integration_type=0&scope=bot+applications.commands" className="px-10 py-3 m-0 text-lg font-semibold rounded-xl bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 hover:cursor-pointer">
-                                Add to Discord
-                            </a>
-                        </div>
+                    <div className="flex flex-col justify-center flex-1 p-6 sm:p-8">
+                        <h3 className="text-2xl sm:text-3xl font-bold mb-4">Structured Learning Paths</h3>
+                        <p className="text-neutral-600 dark:text-neutral-300 text-lg leading-relaxed">
+                            Progress through carefully designed levels and modules, from beginner to advanced. Each lesson builds on the previous one, ensuring a solid foundation in Japanese.
+                        </p>
                     </div>
                 </div>
-                <div className="flex flex-col overflow-hidden rounded-md lg:flex-row gap-x-5">
-                    <img src="https://res.cloudinary.com/dykzzd9sy/image/upload/v1761674556/luc3_bckrng.png" alt="" className="h-64 sm:h-80 w-full object-cover lg:w-1/2" />
-                    <div className="flex flex-col justify-center flex-1 p-4 sm:p-6 text-center xl:text-left md:text-left sm:text-center">
-                        <h3 className="text-2xl sm:text-3xl font-bold">Lyrics on Demand</h3>
-                        <p className="my-4 sm:my-6 text-neutral-500 dark:text-white text-xl">Search for your favourite song lyrics right inside Discord</p>
-                        <div className="flex justify-center sm:justify-center md:justify-start xl:justify-start">
-                            <a href="https://discord.com/oauth2/authorize?client_id=1338873280941129789&permissions=257024&integration_type=0&scope=bot+applications.commands" className="px-10 py-3 m-0 text-lg font-semibold rounded-xl bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 hover:cursor-pointer">
-                                Add to Discord
-                            </a>
+
+                <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row-reverse gap-x-5 shadow-sm">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center p-8">
+                        <div className="text-white text-center">
+                            <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-xl font-semibold">Interactive Quizzes</p>
                         </div>
                     </div>
+                    <div className="flex flex-col justify-center flex-1 p-6 sm:p-8">
+                        <h3 className="text-2xl sm:text-3xl font-bold mb-4">Interactive Quizzes</h3>
+                        <p className="text-neutral-600 dark:text-neutral-300 text-lg leading-relaxed">
+                            Test your knowledge with engaging quizzes after each module. Get instant feedback and track your performance to identify areas for improvement.
+                        </p>
+                    </div>
                 </div>
-                <div className="flex flex-col overflow-hidden rounded-md lg:flex-row-reverse">
-                    <img src="https://res.cloudinary.com/dykzzd9sy/image/upload/v1761674555/luc4_pfwyoh.png" alt="" className="h-64 sm:h-80 w-full object-cover lg:w-1/2" />
-                    <div className="flex flex-col justify-center flex-1 p-4 sm:p-6 text-center xl:text-left md:text-left sm:text-center">
-                        <h3 className="text-2xl sm:text-3xl font-bold">Slash Command Support</h3>
-                        <p className="my-4 sm:my-6 text-neutral-500 dark:text-white text-xl">All features run with clean, modern slash commands for a smooth Discord experience</p>
-                        <div className="flex justify-center sm:justify-center md:justify-start xl:justify-start">
-                            <a href="https://discord.com/oauth2/authorize?client_id=1338873280941129789&permissions=257024&integration_type=0&scope=bot+applications.commands" className="px-10 py-3 m-0 text-lg font-semibold rounded-xl bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 hover:cursor-pointer">
-                                Add to Discord
-                            </a>
+
+                <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row gap-x-5 shadow-sm">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center p-8">
+                        <div className="text-white text-center">
+                            <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <p className="text-xl font-semibold">Progress Tracking</p>
                         </div>
+                    </div>
+                    <div className="flex flex-col justify-center flex-1 p-6 sm:p-8">
+                        <h3 className="text-2xl sm:text-3xl font-bold mb-4">Track Your Progress</h3>
+                        <p className="text-neutral-600 dark:text-neutral-300 text-lg leading-relaxed">
+                            Monitor your learning journey with detailed progress tracking. See which modules you've completed, your quiz scores, and unlock new levels as you advance.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col overflow-hidden rounded-lg border bg-white dark:bg-neutral-800 lg:flex-row-reverse gap-x-5 shadow-sm">
+                    <div className="h-64 sm:h-80 w-full lg:w-1/2 bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center p-8">
+                        <div className="text-white text-center">
+                            <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <p className="text-xl font-semibold">AI-Powered</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col justify-center flex-1 p-6 sm:p-8">
+                        <h3 className="text-2xl sm:text-3xl font-bold mb-4">AI-Powered Feedback</h3>
+                        <p className="text-neutral-600 dark:text-neutral-300 text-lg leading-relaxed">
+                            Receive personalized feedback and recommendations powered by AI. Adaptive learning adjusts to your pace and helps you focus on areas that need more practice.
+                        </p>
                     </div>
                 </div>
             </div>

@@ -214,7 +214,7 @@ export default function Profile() {
                       <td className="py-3 px-4">{mp.module.title}</td>
                       <td className="py-3 px-4">{mp.module.level.title}</td>
                       <td className="py-3 px-4">
-                        <Progress value={mp.progress} className="h-2 w-24" />
+                        <Progress value={mp.progress * 100} className="h-2 w-24" />
                       </td>
                       <td className="py-3 px-4">
                         {mp.completed ? (

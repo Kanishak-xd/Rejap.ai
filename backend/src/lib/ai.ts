@@ -1,10 +1,12 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Initialize Google AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+// Initialize Groq
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY || '',
+});
 
 // System instruction for all AI calls
 const SYSTEM_CONSTRAINT = 'Use ONLY the provided vocabulary, kanji, and grammar. Do NOT introduce new Japanese words or cultural concepts.';
@@ -31,9 +33,16 @@ export async function generateQuizQuestions(
     options: string[];
     correct_answer: string;
 }>> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     const contentList = allowedContent.join('\n');
+
+    // Determine question format based on level
+    const isBeginnerLevel = level.toLowerCase().includes('beginner');
+    const questionFormat = isBeginnerLevel
+        ? `- Questions must be in ENGLISH asking about Japanese words/concepts
+- Options must be in JAPANESE
+- Example: "What is the Japanese word for 'dog'?" with options like "犬", "猫", "鳥", "魚"`
+        : `- Questions can be in Japanese or English as appropriate for the level
+- Mix of Japanese and English in questions and answers`;
 
     const prompt = `${SYSTEM_CONSTRAINT}
 
@@ -47,24 +56,41 @@ ${contentList}
 
 Requirements:
 - Generate exactly 5 questions
-- Each question must have 4 options (A, B, C, D)
+- Each question must have 4 options
+${questionFormat}
 - Only use vocabulary, kanji, and grammar from the allowed content above
-- Do NOT introduce any new Japanese words
+- Do NOT introduce any new Japanese words not in the allowed content
+- Make questions clear and educational
+- Ensure one option is clearly correct
 - Return a JSON array with this exact structure:
 [
   {
-    "question_text": "Question here",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correct_answer": "Option A"
+    "question_text": "What is the Japanese word for 'dog'?",
+    "options": ["犬", "猫", "鳥", "魚"],
+    "correct_answer": "犬"
   }
 ]
 
 Return ONLY valid JSON, no additional text.`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: SYSTEM_CONSTRAINT,
+                },
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
+            model: 'llama-3.3-70b-versatile', // Fast and capable model
+            temperature: 0.7,
+            max_tokens: 2000,
+        });
+
+        const text = completion.choices[0]?.message?.content || '';
 
         // Log the AI response
         logAIResponse('generateQuizQuestions', prompt, text, { level, moduleName });
@@ -103,8 +129,6 @@ export async function explainAnswer(
     correctAnswer: string,
     allowedContent: string[]
 ): Promise<string> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     const contentList = allowedContent.join('\n');
 
     const prompt = `${SYSTEM_CONSTRAINT}
@@ -129,9 +153,23 @@ Requirements:
 Provide only the explanation text, no additional formatting.`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text().trim();
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: SYSTEM_CONSTRAINT,
+                },
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.7,
+            max_tokens: 200,
+        });
+
+        const text = completion.choices[0]?.message?.content?.trim() || '';
 
         logAIResponse('explainAnswer', prompt, text, { level, question: question.substring(0, 50) });
 
@@ -151,8 +189,6 @@ export async function analyzePerformance(
     scores: Array<{ module: string; score: number }>,
     incorrectSummary: string
 ): Promise<{ strengths: string[]; weakAreas: string[] }> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     const scoresText = scores.map(s => `${s.module}: ${(s.score * 100).toFixed(0)}%`).join('\n');
 
     const prompt = `${SYSTEM_CONSTRAINT}
@@ -180,9 +216,23 @@ Requirements:
 Return ONLY valid JSON, no additional text.`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text().trim();
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: SYSTEM_CONSTRAINT,
+                },
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.7,
+            max_tokens: 500,
+        });
+
+        const text = completion.choices[0]?.message?.content?.trim() || '';
 
         logAIResponse('analyzePerformance', prompt, text, { level });
 
@@ -212,8 +262,6 @@ export async function recommendNextSteps(
     summary: string,
     weakAreas: string[]
 ): Promise<string> {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     const weakAreasText = weakAreas.join(', ');
 
     const prompt = `${SYSTEM_CONSTRAINT}
@@ -238,9 +286,23 @@ Requirements:
 Provide only the recommendation text, no additional formatting.`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text().trim();
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: SYSTEM_CONSTRAINT,
+                },
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.8,
+            max_tokens: 300,
+        });
+
+        const text = completion.choices[0]?.message?.content?.trim() || '';
 
         logAIResponse('recommendNextSteps', prompt, text, { level });
 
@@ -251,4 +313,3 @@ Provide only the recommendation text, no additional formatting.`;
         return 'Keep up the great work! Continue practicing and you\'ll see improvement.';
     }
 }
-

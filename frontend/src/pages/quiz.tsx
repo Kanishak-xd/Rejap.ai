@@ -4,7 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  CheckCircle2,
+  XCircle,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Send,
+  BookOpen
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import NextStepsCard from "@/components/next-steps-card"
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
 
@@ -30,18 +40,13 @@ interface Quiz {
   questions: QuizQuestion[]
 }
 
-interface Feedback {
-  questionId: string
-  feedback: string
-}
-
 export default function Quiz() {
   const { level, module: moduleId } = useParams<{ level: string; module: string }>()
   const navigate = useNavigate()
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
-  const [feedback, setFeedback] = useState<Record<string, Feedback>>({})
+  const [quizResults, setQuizResults] = useState<any>(null)
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -52,6 +57,7 @@ export default function Quiz() {
   }, [moduleId])
 
   const fetchQuiz = async () => {
+    setLoading(true)
     try {
       const response = await fetch(`${API_BASE}/quiz?moduleId=${moduleId}`, {
         credentials: "include",
@@ -95,6 +101,7 @@ export default function Quiz() {
         credentials: "include",
         body: JSON.stringify({
           quizId: quiz.id,
+          moduleId: quiz.module.id,
           answers: Object.entries(selectedAnswers).map(([questionId, answer]) => ({
             questionId,
             answer,
@@ -104,22 +111,20 @@ export default function Quiz() {
 
       if (response.ok) {
         const data = await response.json()
-        // Store feedback for incorrect answers
-        const feedbackMap: Record<string, Feedback> = {}
-        data.results?.forEach((result: any) => {
-          if (!result.correct && result.feedback) {
-            feedbackMap[result.questionId] = {
-              questionId: result.questionId,
-              feedback: result.feedback,
-            }
-          }
-        })
-        setFeedback(feedbackMap)
+        setQuizResults(data)
         setSubmitted(true)
       }
     } catch (error) {
       console.error("Failed to submit quiz:", error)
     }
+  }
+
+  const handleRetry = () => {
+    setSubmitted(false);
+    setQuizResults(null);
+    setSelectedAnswers({});
+    setCurrentQuestionIndex(0);
+    fetchQuiz();
   }
 
   if (loading) {
@@ -164,82 +169,142 @@ export default function Quiz() {
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-['Roboto']">
-            {currentQuestion.question}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={selectedAnswers[currentQuestion.id] || ""}
-            onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
-            disabled={submitted}
-          >
-            {currentQuestion.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 py-2">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label
-                  htmlFor={`option-${index}`}
-                  className="flex-1 cursor-pointer"
-                >
-                  {option}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-
-          {/* Show feedback for incorrect answers */}
-          {submitted && feedback[currentQuestion.id] && (
-            <Alert className="mt-4 border-destructive">
-              <AlertDescription>
-                <strong>Incorrect.</strong> {feedback[currentQuestion.id].feedback}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Navigation buttons */}
-          <div className="flex justify-between mt-6">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-            >
-              Previous
-            </Button>
-            {isLastQuestion ? (
-              <Button
-                onClick={handleSubmit}
-                disabled={!allAnswered || submitted}
-              >
-                {submitted ? "Submitted" : "Submit Quiz"}
-              </Button>
-            ) : (
-              <Button onClick={handleNext} disabled={!selectedAnswers[currentQuestion.id]}>
-                Next
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Results summary */}
-      {submitted && (
-        <Card className="mt-8">
+      {!submitted ? (
+        <Card className="border-2 shadow-md">
           <CardHeader>
-            <CardTitle className="font-['Roboto']">Quiz Complete!</CardTitle>
+            <CardTitle className="text-xl font-semibold">
+              {currentQuestion.question}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">
-              You've completed the quiz. Review your answers above or return to the module.
-            </p>
-            <Button asChild>
-              <Link to={`/learn/${level}/${moduleId}`}>Back to Module</Link>
-            </Button>
+            <RadioGroup
+              value={selectedAnswers[currentQuestion.id] || ""}
+              onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
+              className="space-y-3"
+            >
+              {currentQuestion.options.map((option, index) => (
+                <div key={index} className={cn(
+                  "flex items-center space-x-3 p-4 rounded-xl border-2 transition-all cursor-pointer hover:bg-accent",
+                  selectedAnswers[currentQuestion.id] === option ? "border-primary bg-primary/5" : "border-transparent bg-muted/50"
+                )}>
+                  <RadioGroupItem value={option} id={`option-${index}`} />
+                  <Label
+                    htmlFor={`option-${index}`}
+                    className="flex-1 cursor-pointer font-medium"
+                  >
+                    {option}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+
+            {/* Navigation buttons */}
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+                className="gap-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              {isLastQuestion ? (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!allAnswered}
+                  className="gap-2 px-8"
+                >
+                  <Send className="w-4 h-4" />
+                  Submit Quiz
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={!selectedAnswers[currentQuestion.id]}
+                  className="gap-2"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
+      ) : quizResults && (
+        <>
+          <NextStepsCard
+            passed={quizResults.passed}
+            score={quizResults.score}
+            correctCount={quizResults.correctCount}
+            totalQuestions={quizResults.totalQuestions}
+            aiRecommendation={quizResults.aiRecommendation}
+            nextModule={quizResults.nextModule}
+            levelPromoted={quizResults.levelPromoted}
+            level={level || ''}
+            moduleId={moduleId || ''}
+            onRetry={handleRetry}
+          />
+
+          {/* Detailed Review Section */}
+          <div className="mt-12 space-y-6">
+            <h3 className="font-bold text-2xl border-b pb-2 flex items-center gap-2">
+              <BookOpen className="w-6 h-6" />
+              Detailed Review
+            </h3>
+            <div className="space-y-4">
+              {quiz?.questions.map((question, index) => {
+                const result = quizResults.results?.find((r: any) => r.questionId === question.id)
+                const isCorrect = result?.correct
+
+                return (
+                  <div key={question.id} className={cn(
+                    "border rounded-xl p-6 transition-all",
+                    isCorrect ? "bg-green-50/50 border-green-100" : "bg-orange-50/50 border-orange-100"
+                  )}>
+                    <div className="flex items-start gap-4">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1",
+                        isCorrect ? "bg-green-500 text-white" : "bg-orange-500 text-white"
+                      )}>
+                        {isCorrect ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-3">
+                          {index + 1}. {question.question}
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div className="p-3 rounded-lg bg-background/50 border">
+                            <span className="text-muted-foreground block mb-1">Your Answer</span>
+                            <span className={isCorrect ? 'text-green-700 font-medium' : 'text-orange-700 font-medium'}>
+                              {selectedAnswers[question.id] || 'No answer'}
+                            </span>
+                          </div>
+                          {!isCorrect && (
+                            <div className="p-3 rounded-lg bg-background/50 border">
+                              <span className="text-muted-foreground block mb-1">Correct Answer</span>
+                              <span className="text-green-700 font-medium">{question.correctAnswer}</span>
+                            </div>
+                          )}
+                        </div>
+                        {!isCorrect && result?.feedback && (
+                          <div className="mt-4 p-4 bg-white/80 border border-orange-200 rounded-lg shadow-sm">
+                            <div className="flex items-center gap-2 text-orange-800 font-semibold mb-1 text-sm">
+                              <Sparkles className="w-4 h-4" />
+                              AI Explanation
+                            </div>
+                            <p className="text-sm text-orange-900 leading-relaxed">{result.feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
 }
-

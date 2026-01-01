@@ -12,7 +12,7 @@ router.use('/', learningRoutes);
 router.use('/user', userRoutes);
 
 // Quiz routes
-router.use('/', quizRoutes);
+router.use('/quiz', quizRoutes);
 
 // API info
 router.get('/', (req, res) => {
