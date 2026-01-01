@@ -14,7 +14,7 @@ Rejap.ai is an AI-powered Japanese learning platform designed to provide a perso
   
 - **AI Diagnostic Quiz**:
   ![AI Diagnostic Quiz](https://res.cloudinary.com/dykzzd9sy/image/upload/v1767292793/5bacdf78-27ad-49cb-96a8-ec8e2e234ea0.png)
-  ![AI Diagnostic Quiz Result](https://res.cloudinary.com/dykzzd9sy/image/upload/v1767292793/5bacdf78-27ad-49cb-96a8-ec8e2e234ea0.png)
+  ![AI Diagnostic Quiz Result](https://res.cloudinary.com/dykzzd9sy/image/upload/v1767292880/61efa6f8-ad30-492b-866b-955788c669c6.png)
   
 - **Quiz & AI Feedback**:
   ![Quiz & AI Feedback](https://res.cloudinary.com/dykzzd9sy/image/upload/v1767293079/0090d946-c485-470f-854d-84a394a41c7c.png)
